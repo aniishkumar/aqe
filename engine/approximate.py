@@ -8,39 +8,51 @@ from engine.sketches import (
 
 
 def run_approximate_query(df, query_type, column=None, group_by=None, sample_rate=0.1):
-    start = time.time()
+    start = time.perf_counter()
 
-    sample = df.sample(frac=sample_rate, random_state=42)
+    #  Normalize query type
+    query_type = query_type.lower()
+
+    #  Faster sampling (NO random overhead)
+    sample_size = int(len(df) * sample_rate)
+    sample = df.iloc[:sample_size]
+
+    #  GROUP BY handling
+    if group_by:
+        if query_type == "avg":
+            result = sample.groupby(group_by)[column].mean().to_dict()
+        elif query_type == "sum":
+            result = sample.groupby(group_by)[column].sum().to_dict()
+        elif query_type == "count":
+            result = (sample.groupby(group_by)[column].count() / sample_rate).to_dict()
+        else:
+            result = None
 
     #  COUNT DISTINCT (HLL)
-    if query_type == "COUNT_DISTINCT":
-        result = approximate_count_distinct(df[column])
+    elif query_type == "count_distinct":
+        result = approximate_count_distinct(df[column]) #changing from sample to df couz hll already uses sampled data
 
     #  FREQUENCY (Count-Min Sketch)
-    elif query_type == "FREQUENCY":
+    elif query_type == "frequency":
         cms = build_frequency_sketch(sample[column])
         result = {val: cms.estimate(val) for val in sample[column].unique()}
 
     #  COUNT
-    elif query_type == "COUNT":
+    elif query_type == "count":
         result = len(sample) / sample_rate
 
     #  AVG
-    elif query_type == "AVG":
+    elif query_type == "avg":
         result = sample[column].mean()
 
     #  SUM
-    elif query_type == "SUM":
+    elif query_type == "sum":
         result = sample[column].sum() / sample_rate
-
-    #  GROUP BY
-    elif group_by is not None:
-        result = sample.groupby(group_by)[column].mean().to_dict()
 
     else:
         result = None
 
-    end = time.time()
+    end = time.perf_counter()
 
     return {
         "result": result,

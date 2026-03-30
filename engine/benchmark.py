@@ -66,12 +66,12 @@ if __name__ == "__main__":
     import pandas as pd
 
     df = pd.DataFrame({
-        'fare_amount': [10, 20, 15, 8, 25, 12, 30, 5, 18, 20],
+        'fare_amount': [10, 20, 15, 8, 25, 12, 30, 5, 18, 10],
         'trip_distance': [2.1, 4.5, 3.2, 1.0, 5.5, 2.8, 6.0, 0.9, 3.8, 4.2]
     })
 
     result = run_benchmark(df, "COUNT_DISTINCT", column="fare_amount")
 
-    print("\n=== BENCHMARK RESULT ===")
+    print("\n-- BENCHMARK RESULT--")
     for key, value in result.items():
         print(f"{key}: {value}")

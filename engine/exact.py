@@ -2,7 +2,7 @@ import time
 
 
 def run_exact_query(df, query_type, column=None, group_by=None):
-    start = time.time()
+    start = time.perf_counter()
 
     # COUNT
     if query_type == "COUNT":
@@ -31,7 +31,7 @@ def run_exact_query(df, query_type, column=None, group_by=None):
     else:
         raise ValueError("Invalid query type")
 
-    end = time.time()
+    end = time.perf_counter()
 
     return {
         "result": result,
