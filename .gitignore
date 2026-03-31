@@ -1,6 +1,24 @@
+# Python
 venv/
+.venv/
 __pycache__/
 *.pyc
+
+# OS
 .DS_Store
+
+# Data
 data/*.parquet
 data/*.csv
+
+# Node
+node_modules/
+frontend/approx-engine2/node_modules/
+
+# Env files (IMPORTANT)
+.env
+frontend/approx-engine2/.env
+
+# Build
+dist/
+build/
