@@ -5,14 +5,14 @@ import zlib
 import hashlib
 
 
-def approximate_count_distinct(series, num_buckets=256):
+def approximate_count_distinct(series, num_buckets=1024):
     bucket_bits = int(math.log2(num_buckets))
     
     # im using VECTORIZED HASHING (C-Level)
     # pd.util.hash_pandas_object uses a highly optimized C hash function, returning 64-bit uints.
     # This completely eliminates the slow hashlib.md5 pure Python loop.
     #makes the entire value to hashfunctions
-    hashes = pd.util.hash_pandas_object(series, index=False).values
+    hashes = pd.util.hash_pandas_object(series, index=False).values.astype(np.uint64)
     
     #  VECTORIZED BITWISE MATH
     # Calculate bucket indices for the entire array at once
@@ -20,7 +20,7 @@ def approximate_count_distinct(series, num_buckets=256):
     
     # Shift array to get the remaining bits
     remaining_hashes = hashes >> bucket_bits
-    
+     
     # Vectorized calculation of bit lengths
     # np.log2 is incredibly fast for finding the highest set bit.
     with np.errstate(divide='ignore'):

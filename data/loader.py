@@ -7,7 +7,7 @@ _data_cache = None
 
 def load_data(
     file_name: str = "yellow_tripdata_2015-01.csv",
-    sample_size: int | None = 1000000
+    sample_size: int | None = 1048576
 ):
     """
     Loads NYC Taxi dataset.

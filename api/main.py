@@ -5,10 +5,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from engine.benchmark import run_benchmark
 from data.loader import load_data
 
-# 🚀 Create FastAPI app
+#  Create FastAPI app
 app = FastAPI()
 
-# 🌐 Enable CORS (for frontend later)
+#  Enable CORS (for frontend later)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -17,11 +17,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# 📊 Load dataset once at startup
+#  Load dataset once at startup
 df = load_data()
 
 
-# 🧾 Request schema
+#  Request schema
 class QueryRequest(BaseModel):
     query_type: str
     column: str
@@ -32,7 +32,7 @@ class QueryRequest(BaseModel):
 #  Home route
 @app.get("/")
 def home():
-    return {"message": "AQP Engine API Running 🚀"}
+    return {"message": "AQP Engine API Running "}
 
 
 #  Dataset info (VERY IMPORTANT for testing)
@@ -70,7 +70,14 @@ def run_query(req: QueryRequest):
             group_by=req.group_by,
             sample_rate=req.sample_rate
         )
-        return result
+
+        #  define inside try (correct indentation)
+        def to_python(x):
+            if hasattr(x, "item"):
+                return x.item()
+            return x
+
+        return {k: to_python(v) for k, v in result.items()}
 
     except Exception as e:
         return {"error": str(e)}
