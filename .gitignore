@@ -19,6 +19,8 @@ frontend/approx-engine2/node_modules/
 .env
 frontend/approx-engine2/.env
 
-# Build
+# Build & Database
 dist/
 build/
+*.db
+.pytest_cache/

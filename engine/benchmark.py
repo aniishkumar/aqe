@@ -1,77 +1,83 @@
 import time
-
+import pandas as pd
+from typing import Optional, List, Dict, Any
 from engine.approximate import run_approximate_query
 from engine.exact import run_exact_query
 
-
-def run_benchmark(df, query_type, column=None, group_by=None, sample_rate=0.1):
-    # Run approximate query
-    approx_result = run_approximate_query(
-        df,
-        query_type,
+def run_benchmark(
+    df: pd.DataFrame,
+    query_type: str,
+    column: Optional[str] = None,
+    group_by: Optional[str] = None,
+    precision_p: int = 10,
+    sample_rate: float = 0.1,
+    representation: str = "DENSE",
+    filters: Optional[List[Dict[str, Any]]] = None,
+    run_exact: bool = True
+) -> dict:
+    """
+    Executes approximate query, optional exact query benchmark,
+    calculates error percent, speedup, and detailed performance metrics.
+    """
+    # 1. Run Approximate Query
+    approx_res = run_approximate_query(
+        df=df,
+        query_type=query_type,
         column=column,
         group_by=group_by,
-        sample_rate=sample_rate
+        precision_p=precision_p,
+        sample_rate=sample_rate,
+        representation=representation,
+        filters=filters
     )
 
-    # Run exact query
-    exact_result = run_exact_query(
-        df,
-        query_type,
-        column=column,
-        group_by=group_by
-    )
+    exact_res = None
+    exact_value = None
+    exact_time_ms = None
+    error_pct = None
+    speedup = None
 
-    # Extract values
-    approx_value = approx_result["result"]
-    exact_value = exact_result["result"]
+    # 2. Run Exact Benchmark (if requested)
+    if run_exact:
+        exact_res = run_exact_query(
+            df=df,
+            query_type=query_type,
+            column=column,
+            group_by=group_by,
+            filters=filters
+        )
+        exact_value = exact_res["result"]
+        exact_time_ms = exact_res["time_ms"]
 
-    # Calculate error %
-    try:
-        if isinstance(approx_value, dict):
-            # GROUP BY case
-            error_pct = {}
-            for key in approx_value:
-                if key in exact_value and exact_value[key] != 0:
-                    error_pct[key] = abs((approx_value[key] - exact_value[key]) / exact_value[key]) * 100
+        approx_val = approx_res["result"]
+        # Error calculation
+        if isinstance(approx_val, dict) and isinstance(exact_value, dict):
+            group_errors = {}
+            for k, app_v in approx_val.items():
+                if k in exact_value and exact_value[k] != 0:
+                    group_errors[k] = round(abs(app_v - exact_value[k]) / exact_value[k] * 100, 3)
+            error_pct = group_errors
+        elif exact_value is not None and exact_value != 0 and isinstance(approx_val, (int, float)):
+            error_pct = round(abs(approx_val - exact_value) / exact_value * 100, 4)
         else:
-            if exact_value != 0:
-                error_pct = abs((approx_value - exact_value) / exact_value) * 100
-            else:
-                error_pct = 0
-    except:
-        error_pct = None
+            error_pct = 0.0
 
-    # Calculate speedup
-    approx_time = approx_result["time_ms"]
-    exact_time = exact_result["time_ms"]
-
-    if approx_time > 0:
-        speedup = exact_time / approx_time
-    else:
-        speedup = None
+        if approx_res["time_ms"] > 0:
+            speedup = round(exact_time_ms / approx_res["time_ms"], 2)
+        else:
+            speedup = 1.0
 
     return {
-        "approx_result": approx_value,
+        "approx_result": approx_res["result"],
         "exact_result": exact_value,
         "error_pct": error_pct,
-        "approx_time_ms": approx_time,
-        "exact_time_ms": exact_time,
-        "speedup": speedup
+        "approx_time_ms": approx_res["time_ms"],
+        "exact_time_ms": exact_time_ms,
+        "speedup": speedup,
+        "precision_p": approx_res["precision_p"],
+        "register_count": approx_res["register_count"],
+        "theoretical_error": approx_res["theoretical_error"],
+        "rows_processed": approx_res["rows_processed"],
+        "memory_bytes": approx_res["memory_bytes"],
+        "sketch": approx_res["sketch"]
     }
-
-
-# main funciton
-if __name__ == "__main__":
-    import pandas as pd
-
-    df = pd.DataFrame({
-        'fare_amount': [10, 20, 15, 8, 25, 12, 30, 5, 18, 10],
-        'trip_distance': [2.1, 4.5, 3.2, 1.0, 5.5, 2.8, 6.0, 0.9, 3.8, 4.2]
-    })
-
-    result = run_benchmark(df, "COUNT_DISTINCT", column="fare_amount")
-
-    print("\n-- BENCHMARK RESULT--")
-    for key, value in result.items():
-        print(f"{key}: {value}")
