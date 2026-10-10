@@ -1,4 +1,4 @@
-import { FileText, Database, Shield, BookOpen, ExternalLink, GitBranch, Check } from "lucide-react";
+import { ExternalLink, Database, GitBranch } from "lucide-react";
 
 export default function ProposalDocs() {
   const entities = [
@@ -16,37 +16,32 @@ export default function ProposalDocs() {
   ];
 
   return (
-    <div style={{ padding: "2rem", display: "flex", flexDirection: "column", gap: "1.75rem", maxWidth: 1100, margin: "0 auto" }} className="animate-fade-in">
-      {/* Header Banner */}
+    <div style={{ padding: "16px 20px", display: "flex", flexDirection: "column", gap: "14px", maxWidth: 1000, margin: "0 auto" }}>
+      {/* Document Header */}
       <div style={{
-        background: "linear-gradient(135deg, rgba(124, 58, 237, 0.15) 0%, rgba(6, 182, 212, 0.1) 100%)",
-        border: "1px solid rgba(168, 85, 247, 0.3)",
-        borderRadius: 14,
-        padding: "1.75rem",
+        background: "#0f172a",
+        border: "1px solid #1e293b",
+        borderRadius: "4px",
+        padding: "14px 18px",
         display: "flex",
         justifyContent: "space-between",
         alignItems: "flex-start",
         flexWrap: "wrap",
-        gap: "1rem"
+        gap: "10px"
       }}>
         <div>
-          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.4rem" }}>
-            <span style={{ background: "#7c3aed33", border: "1px solid #7c3aed66", color: "#c084fc", fontFamily: "var(--font-mono)", fontSize: "0.65rem", padding: "0.15rem 0.5rem", borderRadius: 4, fontWeight: 700 }}>
-              BCSE302P – DATABASE SYSTEMS LAB
-            </span>
-            <span style={{ background: "#06b6d433", border: "1px solid #06b6d466", color: "#38bdf8", fontFamily: "var(--font-mono)", fontSize: "0.65rem", padding: "0.15rem 0.5rem", borderRadius: 4, fontWeight: 700 }}>
-              Assessment 6 (10 Marks)
-            </span>
+          <div style={{ fontSize: "11px", color: "#64748b", fontFamily: "var(--font-mono)", marginBottom: "4px" }}>
+            BCSE302P – DATABASE SYSTEMS LAB | ASSESSMENT 6
           </div>
-          <h1 style={{ fontFamily: "var(--font-display)", fontSize: "1.6rem", fontWeight: 700, color: "#fff", margin: "0.2rem 0" }}>
-            AQE – Approximate Query Engine
+          <h1 style={{ fontSize: "16px", fontWeight: 600, color: "#f8fafc", margin: "0 0 4px" }}>
+            AQE – Approximate Query Engine Design Document
           </h1>
-          <p style={{ fontFamily: "var(--font-sans)", fontSize: "0.82rem", color: "var(--text-muted)", margin: 0 }}>
-            HyperLogLog-Based Relational Platform for Fast Distinct Cardinality Estimation and Analytical Processing
+          <p style={{ fontSize: "12px", color: "#94a3b8", margin: 0 }}>
+            HyperLogLog-Based Relational Platform for Fast Distinct Cardinality Estimation
           </p>
         </div>
 
-        <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem", alignItems: "flex-end" }}>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "4px" }}>
           <a
             href="https://github.com/aniishkumar/aqe"
             target="_blank"
@@ -54,54 +49,50 @@ export default function ProposalDocs() {
             style={{
               display: "flex",
               alignItems: "center",
-              gap: "0.4rem",
-              background: "#161726",
-              border: "1px solid var(--border-subtle)",
-              borderRadius: 6,
-              padding: "0.35rem 0.75rem",
+              gap: "4px",
+              background: "#1e293b",
+              border: "1px solid #334155",
+              borderRadius: "3px",
+              padding: "4px 8px",
               color: "#38bdf8",
               fontFamily: "var(--font-mono)",
-              fontSize: "0.72rem",
+              fontSize: "11px",
               textDecoration: "none"
             }}
           >
-            <GitBranch size={13} /> aniishkumar/aqe <ExternalLink size={11} />
+            <GitBranch size={12} /> aniishkumar/aqe <ExternalLink size={10} />
           </a>
-          <span style={{ fontFamily: "var(--font-mono)", fontSize: "0.65rem", color: "var(--text-dim)" }}>
-            Target Database: PostgreSQL (Relational)
+          <span style={{ fontSize: "11px", color: "#64748b" }}>
+            Target Database: PostgreSQL
           </span>
         </div>
       </div>
 
-      {/* 11 Relational Entities Table */}
+      {/* Relational Data Model */}
       <div style={{
-        background: "var(--bg-card)",
-        border: "1px solid var(--border-subtle)",
-        borderRadius: 14,
-        padding: "1.5rem"
+        background: "#0f172a",
+        border: "1px solid #1e293b",
+        borderRadius: "4px",
+        padding: "14px"
       }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "1rem" }}>
-          <Database size={18} color="#c084fc" />
-          <h3 style={{ fontFamily: "var(--font-display)", fontSize: "1.15rem", fontWeight: 700, color: "#f8fafc", margin: 0 }}>
-            Relational Data Model &amp; Table Specifications (Section 8.1 - 8.3)
-          </h3>
+        <div style={{ fontSize: "13px", fontWeight: 600, color: "#f8fafc", marginBottom: "8px" }}>
+          Relational Schema: 11 Normalized Entities (Section 8.1 - 8.3)
         </div>
-
-        <div style={{ overflowX: "auto" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse", fontFamily: "var(--font-mono)", fontSize: "0.72rem" }}>
+        <div style={{ overflowX: "auto", border: "1px solid #1e293b", borderRadius: "3px" }}>
+          <table>
             <thead>
-              <tr style={{ background: "#161726", borderBottom: "1px solid var(--border-subtle)", textAlign: "left" }}>
-                <th style={{ padding: "0.65rem 0.8rem", color: "#f1f5f9" }}>ENTITY / TABLE</th>
-                <th style={{ padding: "0.65rem 0.8rem", color: "#c084fc" }}>PRIMARY KEY</th>
-                <th style={{ padding: "0.65rem 0.8rem", color: "var(--text-muted)" }}>FUNCTION IN AQE SYSTEM</th>
+              <tr>
+                <th>Entity / Table</th>
+                <th>Primary Key</th>
+                <th>Relational Purpose &amp; Constraints</th>
               </tr>
             </thead>
             <tbody>
               {entities.map((e) => (
-                <tr key={e.name} style={{ borderBottom: "1px solid #1c1e30" }}>
-                  <td style={{ padding: "0.65rem 0.8rem", color: "#f8fafc", fontWeight: 700 }}>{e.name}</td>
-                  <td style={{ padding: "0.65rem 0.8rem", color: "#c084fc" }}><code>{e.pk}</code></td>
-                  <td style={{ padding: "0.65rem 0.8rem", color: "var(--text-muted)" }}>{e.purpose}</td>
+                <tr key={e.name}>
+                  <td className="mono" style={{ fontWeight: 600, color: "#f8fafc" }}>{e.name}</td>
+                  <td className="mono" style={{ color: "#38bdf8" }}>{e.pk}</td>
+                  <td style={{ color: "#94a3b8" }}>{e.purpose}</td>
                 </tr>
               ))}
             </tbody>
@@ -109,75 +100,72 @@ export default function ProposalDocs() {
         </div>
       </div>
 
-      {/* 3NF Normalization Section */}
+      {/* Normalization Proofs */}
       <div style={{
-        background: "var(--bg-card)",
-        border: "1px solid var(--border-subtle)",
-        borderRadius: 14,
-        padding: "1.5rem"
+        background: "#0f172a",
+        border: "1px solid #1e293b",
+        borderRadius: "4px",
+        padding: "14px"
       }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "1rem" }}>
-          <Shield size={18} color="#10b981" />
-          <h3 style={{ fontFamily: "var(--font-display)", fontSize: "1.15rem", fontWeight: 700, color: "#f8fafc", margin: 0 }}>
-            Normalization Justification (Section 8.6)
-          </h3>
+        <div style={{ fontSize: "13px", fontWeight: 600, color: "#f8fafc", marginBottom: "10px" }}>
+          Normalization Proof (Section 8.6)
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "1rem" }}>
-          <div style={{ background: "#161726", padding: "1.2rem", borderRadius: 10, border: "1px solid var(--border-subtle)" }}>
-            <span style={{ fontFamily: "var(--font-mono)", fontSize: "0.72rem", color: "#38bdf8", fontWeight: 700, display: "block", marginBottom: "0.5rem" }}>
-              FIRST NORMAL FORM (1NF)
-            </span>
-            <ul style={{ paddingLeft: "1.1rem", fontFamily: "var(--font-sans)", fontSize: "0.75rem", color: "var(--text-muted)", lineHeight: 1.6 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "8px" }}>
+          <div style={{ background: "#0b0f19", border: "1px solid #1e293b", padding: "10px", borderRadius: "4px" }}>
+            <div style={{ fontSize: "11px", fontWeight: 600, color: "#f8fafc", marginBottom: "4px" }}>
+              First Normal Form (1NF)
+            </div>
+            <ul style={{ paddingLeft: "14px", fontSize: "11px", color: "#94a3b8", lineHeight: 1.5 }}>
               <li>All attributes contain atomic values.</li>
-              <li>Multiple query predicates stored as discrete rows in <code>QUERY_FILTERS</code>, not strings.</li>
-              <li>Multiple <code>GROUP BY</code> columns stored as separate rows in <code>QUERY_GROUPINGS</code>.</li>
+              <li>WHERE predicates stored as separate rows in <code>QUERY_FILTERS</code>.</li>
+              <li>GROUP BY columns stored as rows in <code>QUERY_GROUPINGS</code>.</li>
             </ul>
           </div>
 
-          <div style={{ background: "#161726", padding: "1.2rem", borderRadius: 10, border: "1px solid var(--border-subtle)" }}>
-            <span style={{ fontFamily: "var(--font-mono)", fontSize: "0.72rem", color: "#a855f7", fontWeight: 700, display: "block", marginBottom: "0.5rem" }}>
-              SECOND NORMAL FORM (2NF)
-            </span>
-            <ul style={{ paddingLeft: "1.1rem", fontFamily: "var(--font-sans)", fontSize: "0.75rem", color: "var(--text-muted)", lineHeight: 1.6 }}>
-              <li>Non-key attributes depend on the complete composite primary key.</li>
-              <li><code>HLL_REGISTERS.register_value</code> strictly depends on <code>(sketch_id, register_index)</code>.</li>
-              <li>Lineage table <code>SKETCH_MERGES</code> separates merge relationships cleanly.</li>
+          <div style={{ background: "#0b0f19", border: "1px solid #1e293b", padding: "10px", borderRadius: "4px" }}>
+            <div style={{ fontSize: "11px", fontWeight: 600, color: "#f8fafc", marginBottom: "4px" }}>
+              Second Normal Form (2NF)
+            </div>
+            <ul style={{ paddingLeft: "14px", fontSize: "11px", color: "#94a3b8", lineHeight: 1.5 }}>
+              <li>Non-key attributes depend on complete primary keys.</li>
+              <li><code>HLL_REGISTERS.register_value</code> strictly depends on composite key <code>(sketch_id, register_index)</code>.</li>
+              <li>Merge lineage tracked in separate <code>SKETCH_MERGES</code> relation.</li>
             </ul>
           </div>
 
-          <div style={{ background: "#161726", padding: "1.2rem", borderRadius: 10, border: "1px solid var(--border-subtle)" }}>
-            <span style={{ fontFamily: "var(--font-mono)", fontSize: "0.72rem", color: "#10b981", fontWeight: 700, display: "block", marginBottom: "0.5rem" }}>
-              THIRD NORMAL FORM (3NF)
-            </span>
-            <ul style={{ paddingLeft: "1.1rem", fontFamily: "var(--font-sans)", fontSize: "0.75rem", color: "var(--text-muted)", lineHeight: 1.6 }}>
+          <div style={{ background: "#0b0f19", border: "1px solid #1e293b", padding: "10px", borderRadius: "4px" }}>
+            <div style={{ fontSize: "11px", fontWeight: 600, color: "#f8fafc", marginBottom: "4px" }}>
+              Third Normal Form (3NF)
+            </div>
+            <ul style={{ paddingLeft: "14px", fontSize: "11px", color: "#94a3b8", lineHeight: 1.5 }}>
               <li>No transitive functional dependencies.</li>
-              <li><code>dataset_id</code> is only stored in <code>COLUMNS</code>. Associated dataset for queries and sketches is obtained via target column FK.</li>
-              <li>Execution metrics separated from query definitions.</li>
+              <li><code>dataset_id</code> stored exclusively in <code>COLUMNS</code>. Associated dataset for queries is obtained via target column FK.</li>
+              <li>Metrics separated from query requests.</li>
             </ul>
           </div>
         </div>
       </div>
 
-      {/* Relational ER Diagram Visual */}
+      {/* Relational ER Diagram */}
       <div style={{
-        background: "var(--bg-card)",
-        border: "1px solid var(--border-subtle)",
-        borderRadius: 14,
-        padding: "1.5rem"
+        background: "#0f172a",
+        border: "1px solid #1e293b",
+        borderRadius: "4px",
+        padding: "14px"
       }}>
-        <h3 style={{ fontFamily: "var(--font-display)", fontSize: "1.15rem", fontWeight: 700, color: "#f8fafc", margin: "0 0 1rem" }}>
-          Relational Entity-Relationship Diagram (Section 8.8)
-        </h3>
+        <div style={{ fontSize: "13px", fontWeight: 600, color: "#f8fafc", marginBottom: "8px" }}>
+          Relational ER Diagram (Section 8.8)
+        </div>
         <pre style={{
-          background: "#0c0d16",
-          border: "1px solid var(--border-subtle)",
-          borderRadius: 8,
-          padding: "1.2rem",
+          background: "#0b0f19",
+          border: "1px solid #1e293b",
+          borderRadius: "3px",
+          padding: "10px 12px",
           fontFamily: "var(--font-mono)",
-          fontSize: "0.7rem",
+          fontSize: "11px",
           color: "#94a3b8",
-          lineHeight: 1.5,
+          lineHeight: 1.4,
           overflowX: "auto"
         }}>
 {`
@@ -203,39 +191,44 @@ export default function ProposalDocs() {
 
       {/* Reference Paper Mapping */}
       <div style={{
-        background: "var(--bg-card)",
-        border: "1px solid var(--border-subtle)",
-        borderRadius: 14,
-        padding: "1.5rem"
+        background: "#0f172a",
+        border: "1px solid #1e293b",
+        borderRadius: "4px",
+        padding: "14px"
       }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "1rem" }}>
-          <BookOpen size={18} color="#f59e0b" />
-          <h3 style={{ fontFamily: "var(--font-display)", fontSize: "1.15rem", fontWeight: 700, color: "#f8fafc", margin: 0 }}>
-            Reference Paper Mapping (Section 8.10)
-          </h3>
+        <div style={{ fontSize: "13px", fontWeight: 600, color: "#f8fafc", marginBottom: "4px" }}>
+          Reference Paper Implementation Mapping (Section 8.10)
         </div>
-        <p style={{ fontFamily: "var(--font-sans)", fontSize: "0.78rem", color: "var(--text-muted)", marginBottom: "1rem" }}>
+        <p style={{ fontSize: "11px", color: "#64748b", margin: "0 0 8px" }}>
           Heule, S., Nunkesser, M., &amp; Hall, A. (2013). <em>HyperLogLog in Practice: Algorithmic Engineering of a State of the Art Cardinality Estimation Algorithm</em>. EDBT 2013 (Google PowerDrill).
         </p>
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem", fontFamily: "var(--font-mono)", fontSize: "0.72rem" }}>
-          {[
-            { concept: "Distinct Cardinality Estimation", aqe: "QUERY_RESULTS.estimated_cardinality" },
-            { concept: "Precision p & Register Count m=2^p", aqe: "HLL_SKETCHES.precision_p + register_count" },
-            { concept: "Substream Registers State", aqe: "HLL_REGISTERS(sketch_id, register_index)" },
-            { concept: "Small Cardinality Handling", aqe: "representation = SPARSE / DENSE + LinearCounting" },
-            { concept: "Harmonic Mean Alpha Bias Correction", aqe: "ALGORITHM_VERSION (alpha_16, 32, 64, m>=128)" },
-            { concept: "Sketch Mergeability & Distributed Stream", aqe: "SKETCH_MERGES table (register-wise max)" },
-            { concept: "Accuracy & Theoretical Bound 1.04/√m", aqe: "relative_error_target + error_percent" },
-            { concept: "Memory Footprint & Performance", aqe: "EXECUTION_METRICS (latency_ms, memory_bytes)" }
-          ].map((item, i) => (
-            <div key={i} style={{ background: "#161726", padding: "0.6rem 0.8rem", borderRadius: 6, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <span style={{ color: "#e2e8f0" }}>{item.concept}</span>
-              <code style={{ color: "#c084fc", background: "#1c1e30", padding: "0.15rem 0.4rem", borderRadius: 4, fontSize: "0.65rem" }}>
-                {item.aqe}
-              </code>
-            </div>
-          ))}
+        <div style={{ border: "1px solid #1e293b", borderRadius: "3px", overflowX: "auto" }}>
+          <table>
+            <thead>
+              <tr>
+                <th>Paper Algorithm Concept</th>
+                <th>AQE Relational Implementation</th>
+              </tr>
+            </thead>
+            <tbody>
+              {[
+                { concept: "Distinct Cardinality Estimation", aqe: "QUERY_RESULTS.estimated_cardinality" },
+                { concept: "Precision p & Register Count m=2^p", aqe: "HLL_SKETCHES.precision_p + register_count" },
+                { concept: "Substream Registers State", aqe: "HLL_REGISTERS(sketch_id, register_index)" },
+                { concept: "Small Cardinality Handling", aqe: "representation = SPARSE / DENSE + LinearCounting" },
+                { concept: "Harmonic Mean Alpha Bias Correction", aqe: "ALGORITHM_VERSION (alpha_16, 32, 64, m>=128)" },
+                { concept: "Sketch Mergeability & Distributed Stream", aqe: "SKETCH_MERGES table (register-wise max)" },
+                { concept: "Accuracy & Theoretical Bound 1.04/√m", aqe: "relative_error_target + error_percent" },
+                { concept: "Memory Footprint & Performance", aqe: "EXECUTION_METRICS (latency_ms, memory_bytes)" }
+              ].map((item, i) => (
+                <tr key={i}>
+                  <td>{item.concept}</td>
+                  <td className="mono" style={{ color: "#38bdf8" }}>{item.aqe}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { getSketches, getSketchRegisters, buildSketch, getDataInfo } from "../../api";
-import { Database, RefreshCw, BarChart2, Layers, Search, Cpu } from "lucide-react";
+import { Search, Plus } from "lucide-react";
 
 export default function RegisterVisualizer() {
   const [sketches, setSketches] = useState([]);
@@ -57,47 +57,35 @@ export default function RegisterVisualizer() {
     ? activeRegs.filter((r) => r.index.toString().includes(filterIdx))
     : activeRegs.slice(0, 256);
 
-  // Frequency distribution for chart
   const distribution = registerData?.distribution || {};
   const maxFreq = Math.max(...Object.values(distribution), 1);
 
   return (
-    <div style={{ padding: "2rem", display: "flex", flexDirection: "column", gap: "1.5rem" }} className="animate-fade-in">
-      {/* Header */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "1rem" }}>
+    <div style={{ padding: "16px 20px", display: "flex", flexDirection: "column", gap: "14px" }}>
+      {/* Title & Action Bar */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid #1e293b", paddingBottom: "10px", flexWrap: "wrap", gap: "10px" }}>
         <div>
-          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-            <Database size={20} color="#a855f7" />
-            <h1 style={{ fontFamily: "var(--font-display)", fontSize: "1.5rem", fontWeight: 700, color: "#f8fafc", margin: 0 }}>
-              HLL Registers &amp; Relational Dense State
-            </h1>
-          </div>
-          <p style={{ fontFamily: "var(--font-sans)", fontSize: "0.8rem", color: "var(--text-muted)", marginTop: "0.3rem" }}>
-            Direct inspection of PostgreSQL table <code>hll_registers</code> with composite primary key <code>(sketch_id, register_index)</code>.
+          <h2 style={{ fontSize: "14px", fontWeight: 600, color: "#f8fafc", margin: 0 }}>
+            HLL Registers Inspector
+          </h2>
+          <p style={{ fontSize: "11px", color: "#64748b", margin: 0 }}>
+            Direct inspection of PostgreSQL table <code>hll_registers</code> with composite key <code>(sketch_id, register_index)</code>.
           </p>
         </div>
 
-        {/* Build New Sketch Mini-Bar */}
-        <div style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "0.5rem",
-          background: "var(--bg-card)",
-          border: "1px solid var(--border-subtle)",
-          borderRadius: 8,
-          padding: "0.4rem 0.6rem"
-        }}>
+        {/* Build new sketch toolbar */}
+        <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
           <select
             value={buildCol}
             onChange={(e) => setBuildCol(e.target.value)}
-            style={{ background: "#161726", border: "1px solid var(--border-subtle)", borderRadius: 6, padding: "0.35rem 0.5rem", color: "#f1f5f9", fontSize: "0.75rem" }}
+            style={{ padding: "4px 8px", fontSize: "11px" }}
           >
             {columns.map((c) => (<option key={c} value={c}>{c}</option>))}
           </select>
           <select
             value={buildP}
             onChange={(e) => setBuildP(parseInt(e.target.value))}
-            style={{ background: "#161726", border: "1px solid var(--border-subtle)", borderRadius: 6, padding: "0.35rem 0.5rem", color: "#f1f5f9", fontSize: "0.75rem" }}
+            style={{ padding: "4px 8px", fontSize: "11px" }}
           >
             {[6, 8, 10, 12, 14].map((p) => (<option key={p} value={p}>p={p} (m={1 << p})</option>))}
           </select>
@@ -105,82 +93,78 @@ export default function RegisterVisualizer() {
             onClick={handleBuildNew}
             disabled={loading}
             style={{
-              background: "linear-gradient(135deg, #7c3aed, #a855f7)",
-              border: "none",
-              borderRadius: 6,
-              padding: "0.35rem 0.75rem",
-              fontFamily: "var(--font-mono)",
-              fontSize: "0.72rem",
-              fontWeight: 700,
+              background: "#2563eb",
+              border: "1px solid #1d4ed8",
+              borderRadius: "4px",
+              padding: "4px 10px",
+              fontSize: "11px",
+              fontWeight: 500,
               color: "#fff",
-              cursor: "pointer"
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              gap: "4px"
             }}
           >
-            BUILD SKETCH
+            <Plus size={11} /> Build Sketch
           </button>
         </div>
       </div>
 
-      {/* Sketch Selector Grid */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: "0.75rem" }}>
+      {/* Sketch List Bar */}
+      <div style={{ display: "flex", gap: "8px", overflowX: "auto", paddingBottom: "4px" }}>
         {sketches.map((s) => {
           const isSelected = s.sketch_id === selectedSketchId;
           return (
-            <div
+            <button
               key={s.sketch_id}
               onClick={() => setSelectedSketchId(s.sketch_id)}
               style={{
-                background: isSelected ? "rgba(124, 58, 237, 0.15)" : "var(--bg-card)",
-                border: isSelected ? "1px solid #a855f7" : "1px solid var(--border-subtle)",
-                borderRadius: 10,
-                padding: "1rem",
+                background: isSelected ? "#1e293b" : "#0f172a",
+                border: "1px solid " + (isSelected ? "#3b82f6" : "#1e293b"),
+                borderRadius: "4px",
+                padding: "6px 10px",
+                textAlign: "left",
                 cursor: "pointer",
-                transition: "all 0.2s ease"
+                whiteSpace: "nowrap"
               }}
             >
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.4rem" }}>
-                <span style={{ fontFamily: "var(--font-mono)", fontSize: "0.68rem", color: isSelected ? "#c084fc" : "var(--text-muted)", fontWeight: 700 }}>
-                  Sketch #{s.sketch_id}
+              <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                <span style={{ fontSize: "11px", fontWeight: 600, color: isSelected ? "#ffffff" : "#94a3b8" }}>
+                  #{s.sketch_id} - {s.column_name}
                 </span>
                 {s.is_current && (
-                  <span style={{ background: "#10b98122", border: "1px solid #10b98155", color: "#10b981", fontSize: "0.58rem", fontFamily: "var(--font-mono)", padding: "0.1rem 0.35rem", borderRadius: 4 }}>
+                  <span style={{ background: "#16a34a22", border: "1px solid #16a34a44", color: "#16a34a", fontSize: "9px", padding: "1px 4px", borderRadius: "2px" }}>
                     CURRENT
                   </span>
                 )}
               </div>
-              <div style={{ fontFamily: "var(--font-sans)", fontSize: "0.85rem", fontWeight: 600, color: "#f8fafc" }}>
-                {s.column_name || `Column ${s.column_id}`}
+              <div style={{ fontSize: "10px", fontFamily: "var(--font-mono)", color: "#64748b", marginTop: "2px" }}>
+                p={s.precision_p} | m={s.register_count} | {s.representation}
               </div>
-              <div style={{ display: "flex", justifyContent: "space-between", marginTop: "0.5rem", fontFamily: "var(--font-mono)", fontSize: "0.62rem", color: "var(--text-dim)" }}>
-                <span>p = {s.precision_p} (m={s.register_count})</span>
-                <span>{s.representation}</span>
-              </div>
-            </div>
+            </button>
           );
         })}
       </div>
 
-      {/* Main Register Exploration Panel */}
+      {/* Main Exploration Grid */}
       {currentSketch && (
         <div style={{
           display: "grid",
           gridTemplateColumns: "1.2fr 1fr",
-          gap: "1.25rem",
-          background: "var(--bg-card)",
-          border: "1px solid var(--border-subtle)",
-          borderRadius: 14,
-          padding: "1.5rem"
+          gap: "12px",
+          background: "#0f172a",
+          border: "1px solid #1e293b",
+          borderRadius: "4px",
+          padding: "14px"
         }}>
-          {/* Left: Leading Zero Distribution Histogram */}
+          {/* Histogram */}
           <div>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "0.45rem" }}>
-                <BarChart2 size={16} color="#c084fc" />
-                <span style={{ fontFamily: "var(--font-mono)", fontSize: "0.78rem", fontWeight: 700, color: "#f1f5f9" }}>
-                  STATISTIC DISTRIBUTION: ρ(w) MAX LEADING ZEROS
-                </span>
-              </div>
-              <span style={{ fontFamily: "var(--font-mono)", fontSize: "0.65rem", color: "var(--text-dim)" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
+              <span style={{ fontSize: "12px", fontWeight: 600, color: "#f8fafc" }}>
+                Statistic Distribution: &rho;(w) Max Leading Zeros
+              </span>
+              <span style={{ fontSize: "11px", fontFamily: "var(--font-mono)", color: "#64748b" }}>
                 m = {currentSketch.register_count} Buckets
               </span>
             </div>
@@ -188,10 +172,10 @@ export default function RegisterVisualizer() {
             <div style={{
               display: "flex",
               alignItems: "flex-end",
-              height: 180,
-              gap: 4,
-              padding: "0.5rem 0",
-              borderBottom: "1px solid var(--border-subtle)"
+              height: "150px",
+              gap: "3px",
+              padding: "8px 0",
+              borderBottom: "1px solid #1e293b"
             }}>
               {Array.from({ length: 24 }).map((_, lzVal) => {
                 const count = distribution[lzVal] || 0;
@@ -199,7 +183,7 @@ export default function RegisterVisualizer() {
                 return (
                   <div
                     key={lzVal}
-                    title={`Leading Zeros: ${lzVal}\nRegisters: ${count}`}
+                    title={`Leading zeros: ${lzVal}\nRegisters: ${count}`}
                     style={{
                       flex: 1,
                       display: "flex",
@@ -211,71 +195,70 @@ export default function RegisterVisualizer() {
                   >
                     <div style={{
                       width: "100%",
-                      height: `${Math.max(heightPct, count > 0 ? 4 : 0)}%`,
-                      background: count > 0 ? "linear-gradient(to top, #7c3aed, #a855f7)" : "transparent",
-                      borderRadius: "2px 2px 0 0",
-                      transition: "height 0.3s ease"
+                      height: `${Math.max(heightPct, count > 0 ? 3 : 0)}%`,
+                      background: count > 0 ? "#2563eb" : "transparent",
+                      borderRadius: "1px 1px 0 0"
                     }} />
-                    <span style={{ fontFamily: "var(--font-mono)", fontSize: "0.55rem", color: "var(--text-dim)", marginTop: 4 }}>
+                    <span style={{ fontFamily: "var(--font-mono)", fontSize: "9px", color: "#64748b", marginTop: "2px" }}>
                       {lzVal}
                     </span>
                   </div>
                 );
               })}
             </div>
-            <div style={{ fontFamily: "var(--font-mono)", fontSize: "0.62rem", color: "var(--text-dim)", textAlign: "center", marginTop: "0.4rem" }}>
-              ← Maximum Leading Zeros Statistic (ρ(w) ∈ [0, 64]) →
+            <div style={{ fontFamily: "var(--font-mono)", fontSize: "10px", color: "#64748b", textAlign: "center", marginTop: "4px" }}>
+              Leading zero count &rho;(w) &isin; [0, 64]
             </div>
 
-            {/* Sketch Metadata Info */}
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "0.75rem", marginTop: "1.25rem" }}>
-              <div style={{ background: "#161726", padding: "0.75rem", borderRadius: 8 }}>
-                <span style={{ fontFamily: "var(--font-mono)", fontSize: "0.6rem", color: "var(--text-dim)", display: "block" }}>ALGORITHM</span>
-                <span style={{ fontFamily: "var(--font-mono)", fontSize: "0.72rem", color: "#e2e8f0", fontWeight: 700 }}>{currentSketch.algorithm_version}</span>
+            {/* Metadata specs */}
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "6px", marginTop: "12px" }}>
+              <div style={{ background: "#0b0f19", border: "1px solid #1e293b", padding: "6px 8px", borderRadius: "3px" }}>
+                <div style={{ fontSize: "10px", color: "#64748b" }}>Algorithm</div>
+                <div style={{ fontSize: "11px", fontFamily: "var(--font-mono)", color: "#f8fafc", fontWeight: 500 }}>{currentSketch.algorithm_version}</div>
               </div>
-              <div style={{ background: "#161726", padding: "0.75rem", borderRadius: 8 }}>
-                <span style={{ fontFamily: "var(--font-mono)", fontSize: "0.6rem", color: "var(--text-dim)", display: "block" }}>HASH ENGINE</span>
-                <span style={{ fontFamily: "var(--font-mono)", fontSize: "0.72rem", color: "#06b6d4", fontWeight: 700 }}>{currentSketch.hash_version}</span>
+              <div style={{ background: "#0b0f19", border: "1px solid #1e293b", padding: "6px 8px", borderRadius: "3px" }}>
+                <div style={{ fontSize: "10px", color: "#64748b" }}>Hash Engine</div>
+                <div style={{ fontSize: "11px", fontFamily: "var(--font-mono)", color: "#38bdf8", fontWeight: 500 }}>{currentSketch.hash_version}</div>
               </div>
-              <div style={{ background: "#161726", padding: "0.75rem", borderRadius: 8 }}>
-                <span style={{ fontFamily: "var(--font-mono)", fontSize: "0.6rem", color: "var(--text-dim)", display: "block" }}>REPRESENTATION</span>
-                <span style={{ fontFamily: "var(--font-mono)", fontSize: "0.72rem", color: "#10b981", fontWeight: 700 }}>{currentSketch.representation}</span>
+              <div style={{ background: "#0b0f19", border: "1px solid #1e293b", padding: "6px 8px", borderRadius: "3px" }}>
+                <div style={{ fontSize: "10px", color: "#64748b" }}>Representation</div>
+                <div style={{ fontSize: "11px", fontFamily: "var(--font-mono)", color: "#16a34a", fontWeight: 500 }}>{currentSketch.representation}</div>
               </div>
             </div>
           </div>
 
-          {/* Right: Relational Dense Register Rows Table */}
-          <div style={{ display: "flex", flexDirection: "column", height: 340 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.75rem" }}>
-              <span style={{ fontFamily: "var(--font-mono)", fontSize: "0.75rem", fontWeight: 700, color: "#f1f5f9" }}>
-                <code>hll_registers</code> ROWS (2NF)
+          {/* Relational Table */}
+          <div style={{ display: "flex", flexDirection: "column", height: "260px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
+              <span style={{ fontSize: "11px", fontWeight: 600, color: "#94a3b8" }}>
+                Table: <code>hll_registers</code>
               </span>
-              <div style={{ display: "flex", alignItems: "center", background: "#161726", border: "1px solid var(--border-subtle)", borderRadius: 6, padding: "0.2rem 0.5rem" }}>
-                <Search size={12} color="var(--text-dim)" />
+              <div style={{ display: "flex", alignItems: "center", background: "#0b0f19", border: "1px solid #334155", borderRadius: "3px", padding: "2px 6px" }}>
+                <Search size={10} color="#64748b" />
                 <input
                   placeholder="Index..."
                   value={filterIdx}
                   onChange={(e) => setFilterIdx(e.target.value)}
-                  style={{ background: "transparent", border: "none", color: "#fff", fontFamily: "var(--font-mono)", fontSize: "0.65rem", width: 70, marginLeft: 4 }}
+                  style={{ background: "transparent", border: "none", color: "#fff", fontSize: "11px", width: "60px", marginLeft: "4px", padding: "0" }}
                 />
               </div>
             </div>
 
-            <div style={{ flex: 1, overflowY: "auto", border: "1px solid var(--border-subtle)", borderRadius: 8 }}>
-              <table style={{ width: "100%", borderCollapse: "collapse", fontFamily: "var(--font-mono)", fontSize: "0.7rem" }}>
-                <thead style={{ position: "sticky", top: 0, background: "#161726", borderBottom: "1px solid var(--border-subtle)" }}>
+            <div style={{ flex: 1, overflowY: "auto", border: "1px solid #1e293b", borderRadius: "3px" }}>
+              <table>
+                <thead style={{ position: "sticky", top: 0 }}>
                   <tr>
-                    <th style={{ padding: "0.5rem", textAlign: "left", color: "var(--text-muted)" }}>sketch_id</th>
-                    <th style={{ padding: "0.5rem", textAlign: "left", color: "var(--text-muted)" }}>register_index</th>
-                    <th style={{ padding: "0.5rem", textAlign: "right", color: "#c084fc" }}>register_value</th>
+                    <th>sketch_id</th>
+                    <th>register_index</th>
+                    <th style={{ textAlign: "right" }}>register_value</th>
                   </tr>
                 </thead>
                 <tbody>
                   {filteredRegs.map((r) => (
-                    <tr key={r.index} style={{ borderBottom: "1px solid #1c1e30" }}>
-                      <td style={{ padding: "0.4rem 0.5rem", color: "var(--text-dim)" }}>{currentSketch.sketch_id}</td>
-                      <td style={{ padding: "0.4rem 0.5rem", color: "#e2e8f0" }}>{r.index}</td>
-                      <td style={{ padding: "0.4rem 0.5rem", textAlign: "right", color: r.value > 0 ? "#a855f7" : "var(--text-dim)", fontWeight: r.value > 0 ? 700 : 400 }}>
+                    <tr key={r.index}>
+                      <td className="mono" style={{ color: "#64748b" }}>{currentSketch.sketch_id}</td>
+                      <td className="mono">{r.index}</td>
+                      <td className="mono" style={{ textAlign: "right", color: r.value > 0 ? "#f8fafc" : "#64748b", fontWeight: r.value > 0 ? 600 : 400 }}>
                         {r.value}
                       </td>
                     </tr>
@@ -283,9 +266,9 @@ export default function RegisterVisualizer() {
                 </tbody>
               </table>
             </div>
-            <span style={{ fontFamily: "var(--font-mono)", fontSize: "0.6rem", color: "var(--text-dim)", marginTop: "0.4rem" }}>
-              Showing {filteredRegs.length} register entries.
-            </span>
+            <div style={{ fontSize: "10px", color: "#64748b", marginTop: "4px" }}>
+              Showing {filteredRegs.length} register rows (composite PK: sketch_id, register_index).
+            </div>
           </div>
         </div>
       )}

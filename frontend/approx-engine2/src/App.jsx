@@ -8,7 +8,7 @@ import MergeStudio from "./components/MergeStudio/MergeStudio";
 import AnalyticsDashboard from "./components/AnalyticsDashboard/AnalyticsDashboard";
 import ProposalDocs from "./components/ProposalDocs/ProposalDocs";
 import { useQuery } from "./hooks/useQuery";
-import { AlertTriangle, Zap } from "lucide-react";
+import { AlertCircle, Terminal } from "lucide-react";
 
 export default function App() {
   const [activeTab, setActiveTab] = useState("query");
@@ -21,28 +21,27 @@ export default function App() {
   };
 
   return (
-    <div style={{ minHeight: "100vh", background: "var(--bg-dark)", color: "var(--text-main)" }}>
+    <div style={{ minHeight: "100vh", background: "var(--bg-app)", color: "var(--text-main)" }}>
       <Navbar activeTab={activeTab} setActiveTab={setActiveTab} />
 
       {activeTab === "query" && (
-        <div style={{ display: "flex", height: "calc(100vh - 64px)" }}>
+        <div style={{ display: "flex", height: "calc(100vh - 48px)" }}>
           <QueryConfig onSubmit={handleSubmit} loading={loading} />
-          <main style={{ flex: 1, padding: "2rem 2.5rem", overflowY: "auto" }}>
+          <main style={{ flex: 1, padding: "16px 20px", overflowY: "auto" }}>
             {error && (
               <div style={{
-                background: "rgba(239, 68, 68, 0.1)",
-                border: "1px solid rgba(239, 68, 68, 0.3)",
-                borderRadius: 8,
-                padding: "0.85rem 1.25rem",
-                fontFamily: "var(--font-mono)",
-                fontSize: "0.78rem",
+                background: "var(--status-error-bg)",
+                border: "1px solid var(--status-error-border)",
+                borderRadius: "4px",
+                padding: "8px 12px",
+                fontSize: "12px",
                 color: "#f87171",
-                marginBottom: "1.5rem",
+                marginBottom: "14px",
                 display: "flex",
                 alignItems: "center",
-                gap: "0.5rem"
+                gap: "6px"
               }}>
-                <AlertTriangle size={16} /> {error}
+                <AlertCircle size={14} /> {error}
               </div>
             )}
 
@@ -52,52 +51,42 @@ export default function App() {
                 flexDirection: "column",
                 alignItems: "center",
                 justifyContent: "center",
-                height: "65%",
-                gap: "1.25rem",
-                color: "var(--text-dim)",
+                height: "60%",
+                gap: "8px",
+                color: "#64748b",
                 textAlign: "center"
               }}>
                 <div style={{
-                  width: 64,
-                  height: 64,
-                  borderRadius: "50%",
-                  background: "rgba(124, 58, 237, 0.1)",
-                  border: "1px solid rgba(168, 85, 247, 0.2)",
+                  width: 36,
+                  height: 36,
+                  borderRadius: "4px",
+                  background: "#0f172a",
+                  border: "1px solid #1e293b",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center"
                 }}>
-                  <Zap size={30} color="#a855f7" />
+                  <Terminal size={18} color="#94a3b8" />
                 </div>
-                <div>
-                  <h3 style={{ fontFamily: "var(--font-display)", fontSize: "1.2rem", fontWeight: 700, color: "#e2e8f0", marginBottom: "0.4rem" }}>
-                    Ready for Analytical Execution
-                  </h3>
-                  <p style={{ fontFamily: "var(--font-sans)", fontSize: "0.82rem", maxWidth: 440, lineHeight: 1.6, color: "var(--text-muted)" }}>
-                    Configure target column, HLL precision <code style={{ color: "#c084fc" }}>p</code>, and optional filters on the left panel, then run the query to observe sub-millisecond execution and error bounds.
-                  </p>
+                <div style={{ fontSize: "13px", fontWeight: 500, color: "#f8fafc" }}>
+                  Console Idle
                 </div>
-              </div>
-            )}
-
-            {loading && (
-              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "65%", gap: "1rem" }}>
-                <div style={{
-                  width: 48,
-                  height: 48,
-                  border: "3px solid #222538",
-                  borderTopColor: "#a855f7",
-                  borderRadius: "50%",
-                  animation: "spin 0.8s linear infinite"
-                }} />
-                <p style={{ fontFamily: "var(--font-mono)", fontSize: "0.8rem", color: "#c084fc" }}>
-                  Hashing &amp; Updating HLL Registers…
+                <p style={{ fontSize: "12px", maxWidth: 360, color: "#64748b", margin: 0 }}>
+                  Select aggregate parameters and click <strong>Execute Query</strong> to run HLL cardinality estimation and compare against exact table scans.
                 </p>
               </div>
             )}
 
+            {loading && (
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "60%", gap: "8px" }}>
+                <div style={{ fontSize: "12px", color: "#94a3b8", fontFamily: "var(--font-mono)" }}>
+                  Executing query &amp; updating registers...
+                </div>
+              </div>
+            )}
+
             {result && !loading && (
-              <div className="animate-fade-in">
+              <div>
                 <BenchmarkResults result={result} />
                 <QueryOutput result={result} queryParams={lastParams} />
               </div>

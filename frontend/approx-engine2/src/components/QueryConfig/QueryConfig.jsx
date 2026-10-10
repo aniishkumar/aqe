@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { getDataInfo } from "../../api";
-import { Sliders, Plus, Trash2, Database, Cpu, CheckCircle } from "lucide-react";
+import { Play, Plus, X } from "lucide-react";
 
 const QUERY_TYPES = ["COUNT_DISTINCT", "AVG", "SUM", "COUNT"];
 
@@ -31,7 +31,7 @@ export default function QueryConfig({ onSubmit, loading }) {
 
   const mRegisters = 1 << precisionP;
   const theoreticalErr = (1.04 / Math.sqrt(mRegisters) * 100).toFixed(2);
-  const memoryBytes = mRegisters; // 1 byte per register for HLL
+  const memoryBytes = mRegisters;
 
   const addFilter = () => {
     setFilters([...filters, { column: columns[0] || "fare_amount", operator: ">", value: "10" }]);
@@ -64,96 +64,74 @@ export default function QueryConfig({ onSubmit, loading }) {
 
   return (
     <aside style={{
-      width: 340,
-      minWidth: 320,
-      background: "var(--bg-panel)",
-      borderRight: "1px solid var(--border-subtle)",
-      padding: "1.5rem",
+      width: 290,
+      minWidth: 280,
+      background: "#0f172a",
+      borderRight: "1px solid #1e293b",
+      padding: "16px",
       display: "flex",
       flexDirection: "column",
-      gap: "1.25rem",
-      height: "calc(100vh - 64px)",
+      gap: "14px",
+      height: "calc(100vh - 48px)",
       overflowY: "auto",
     }}>
+      {/* Section Header */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-          <Sliders size={16} color="#c084fc" />
-          <h2 style={{ fontFamily: "var(--font-mono)", fontSize: "0.82rem", fontWeight: 700, color: "#f1f5f9", letterSpacing: "0.08em" }}>
-            QUERY PARAMETERS
-          </h2>
-        </div>
-        <span style={{ fontSize: "0.65rem", fontFamily: "var(--font-mono)", color: "var(--text-dim)", background: "#1c1e30", padding: "0.15rem 0.45rem", borderRadius: 4 }}>
-          3NF CONTROL
+        <span style={{ fontSize: "11px", fontWeight: 600, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.04em" }}>
+          Query Configuration
+        </span>
+        <span style={{ fontSize: "11px", color: "#64748b", fontFamily: "var(--font-mono)" }}>
+          dataset: #1
         </span>
       </div>
 
-      <hr style={{ border: "none", borderTop: "1px solid var(--border-subtle)" }} />
-
       {/* Dataset Info Box */}
       <div style={{
-        background: "rgba(22, 23, 38, 0.6)",
-        border: "1px solid var(--border-subtle)",
-        borderRadius: 8,
-        padding: "0.75rem",
+        background: "#1e293b",
+        border: "1px solid #334155",
+        borderRadius: "4px",
+        padding: "8px 10px",
         display: "flex",
         flexDirection: "column",
-        gap: "0.3rem"
+        gap: "2px"
       }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <span style={{ fontFamily: "var(--font-mono)", fontSize: "0.62rem", color: "var(--text-dim)", fontWeight: 700 }}>ACTIVE DATASET</span>
-          <span style={{ fontFamily: "var(--font-mono)", fontSize: "0.62rem", color: "#10b981", display: "flex", alignItems: "center", gap: "0.25rem" }}>
-            <CheckCircle size={10} /> {dataInfo?.rows?.toLocaleString() || "100,000"} Rows
-          </span>
+        <div style={{ fontSize: "11px", color: "#94a3b8" }}>Target Table</div>
+        <div style={{ fontSize: "12px", fontWeight: 600, color: "#f8fafc" }}>
+          {dataInfo?.name || "NYC Taxi Trips"}
         </div>
-        <div style={{ fontFamily: "var(--font-sans)", fontSize: "0.78rem", fontWeight: 600, color: "#e2e8f0" }}>
-          {dataInfo?.name || "NYC Taxi Yellow Cab Trips"}
+        <div style={{ fontSize: "11px", color: "#64748b", fontFamily: "var(--font-mono)" }}>
+          {dataInfo?.rows?.toLocaleString() || "100,000"} rows registered
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "1.1rem" }}>
-        {/* Operation / Query Type */}
+      <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+        {/* Operation */}
         <div>
-          <label style={{ display: "block", fontFamily: "var(--font-mono)", fontSize: "0.65rem", color: "var(--text-muted)", fontWeight: 700, marginBottom: "0.4rem" }}>
-            OPERATION (APPROXIMATE)
+          <label style={{ display: "block", fontSize: "11px", color: "#94a3b8", marginBottom: "4px", fontWeight: 500 }}>
+            Aggregate Function
           </label>
           <select
             value={queryType}
             onChange={(e) => setQueryType(e.target.value)}
-            style={{
-              width: "100%",
-              background: "#161726",
-              border: "1px solid var(--border-subtle)",
-              borderRadius: 6,
-              padding: "0.55rem 0.75rem",
-              color: "#f1f5f9",
-              fontFamily: "var(--font-mono)",
-              fontSize: "0.78rem",
-            }}
+            style={{ width: "100%", background: "#0b0f19", border: "1px solid #334155", borderRadius: "4px", padding: "6px 8px", color: "#f8fafc" }}
           >
             {QUERY_TYPES.map((t) => (
-              <option key={t} value={t}>{t} {t === "COUNT_DISTINCT" ? "(HyperLogLog)" : ""}</option>
+              <option key={t} value={t}>
+                {t} {t === "COUNT_DISTINCT" ? "(HyperLogLog)" : ""}
+              </option>
             ))}
           </select>
         </div>
 
         {/* Target Column */}
         <div>
-          <label style={{ display: "block", fontFamily: "var(--font-mono)", fontSize: "0.65rem", color: "var(--text-muted)", fontWeight: 700, marginBottom: "0.4rem" }}>
-            TARGET COLUMN
+          <label style={{ display: "block", fontSize: "11px", color: "#94a3b8", marginBottom: "4px", fontWeight: 500 }}>
+            Target Column
           </label>
           <select
             value={column}
             onChange={(e) => setColumn(e.target.value)}
-            style={{
-              width: "100%",
-              background: "#161726",
-              border: "1px solid var(--border-subtle)",
-              borderRadius: 6,
-              padding: "0.55rem 0.75rem",
-              color: "#f1f5f9",
-              fontFamily: "var(--font-mono)",
-              fontSize: "0.78rem",
-            }}
+            style={{ width: "100%", background: "#0b0f19", border: "1px solid #334155", borderRadius: "4px", padding: "6px 8px", color: "#f8fafc" }}
           >
             {columns.map((c) => (
               <option key={c} value={c}>{c}</option>
@@ -161,31 +139,23 @@ export default function QueryConfig({ onSubmit, loading }) {
           </select>
         </div>
 
-        {/* HLL Precision Section (if COUNT_DISTINCT) */}
+        {/* Precision Controls */}
         {queryType === "COUNT_DISTINCT" && (
           <div style={{
-            background: "rgba(124, 58, 237, 0.06)",
-            border: "1px solid rgba(168, 85, 247, 0.25)",
-            borderRadius: 8,
-            padding: "0.85rem",
+            background: "#131d2e",
+            border: "1px solid #23354d",
+            borderRadius: "4px",
+            padding: "10px",
             display: "flex",
             flexDirection: "column",
-            gap: "0.6rem"
+            gap: "8px"
           }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <span style={{ fontFamily: "var(--font-mono)", fontSize: "0.65rem", color: "#c084fc", fontWeight: 700 }}>
-                HLL PRECISION (p = {precisionP})
+              <span style={{ fontSize: "11px", fontWeight: 600, color: "#f8fafc" }}>
+                Precision parameter (p = {precisionP})
               </span>
-              <span style={{
-                background: "#7c3aed33",
-                border: "1px solid #7c3aed66",
-                color: "#e9d5ff",
-                fontFamily: "var(--font-mono)",
-                fontSize: "0.65rem",
-                padding: "0.1rem 0.45rem",
-                borderRadius: 4
-              }}>
-                m = {mRegisters.toLocaleString()} Regs
+              <span style={{ fontSize: "11px", fontFamily: "var(--font-mono)", color: "#94a3b8" }}>
+                m = {mRegisters}
               </span>
             </div>
 
@@ -196,48 +166,47 @@ export default function QueryConfig({ onSubmit, loading }) {
               step="1"
               value={precisionP}
               onChange={(e) => setPrecisionP(parseInt(e.target.value))}
-              style={{ width: "100%", accentColor: "#a855f7" }}
+              style={{ width: "100%" }}
             />
 
             <div style={{
               display: "grid",
               gridTemplateColumns: "1fr 1fr",
-              gap: "0.5rem",
-              background: "#12111f",
-              padding: "0.5rem",
-              borderRadius: 6,
+              gap: "6px",
               fontFamily: "var(--font-mono)",
-              fontSize: "0.62rem"
+              fontSize: "11px",
+              paddingTop: "4px",
+              borderTop: "1px solid #1e293b"
             }}>
               <div>
-                <span style={{ color: "var(--text-dim)", display: "block" }}>Theoretical Error:</span>
-                <span style={{ color: "#38bdf8", fontWeight: 700 }}>±{theoreticalErr}%</span>
+                <span style={{ color: "#64748b", display: "block", fontSize: "10px" }}>Std Error (1.04/√m):</span>
+                <span style={{ color: "#38bdf8" }}>±{theoreticalErr}%</span>
               </div>
               <div>
-                <span style={{ color: "var(--text-dim)", display: "block" }}>Memory Footprint:</span>
-                <span style={{ color: "#10b981", fontWeight: 700 }}>
+                <span style={{ color: "#64748b", display: "block", fontSize: "10px" }}>Memory Footprint:</span>
+                <span style={{ color: "#94a3b8" }}>
                   {memoryBytes < 1024 ? `${memoryBytes} B` : `${(memoryBytes / 1024).toFixed(1)} KB`}
                 </span>
               </div>
             </div>
 
-            {/* Representation Toggle */}
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: "0.2rem" }}>
-              <span style={{ fontFamily: "var(--font-mono)", fontSize: "0.62rem", color: "var(--text-muted)" }}>Representation:</span>
-              <div style={{ display: "flex", gap: "0.25rem" }}>
+            {/* Representation */}
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: "4px" }}>
+              <span style={{ fontSize: "11px", color: "#94a3b8" }}>State Layout:</span>
+              <div style={{ display: "flex", gap: "4px" }}>
                 {["DENSE", "SPARSE"].map((rep) => (
                   <button
                     type="button"
                     key={rep}
                     onClick={() => setRepresentation(rep)}
                     style={{
-                      background: representation === rep ? "#7c3aed" : "#1a1b2e",
-                      border: "none",
-                      borderRadius: 4,
-                      padding: "0.2rem 0.5rem",
+                      background: representation === rep ? "#2563eb" : "#0f172a",
+                      border: "1px solid " + (representation === rep ? "#3b82f6" : "#334155"),
+                      borderRadius: "3px",
+                      padding: "2px 8px",
+                      fontSize: "10px",
                       fontFamily: "var(--font-mono)",
-                      fontSize: "0.6rem",
-                      color: "#fff",
+                      color: representation === rep ? "#ffffff" : "#94a3b8",
                       cursor: "pointer"
                     }}
                   >
@@ -249,14 +218,12 @@ export default function QueryConfig({ onSubmit, loading }) {
           </div>
         )}
 
-        {/* Sampling Rate (if not COUNT_DISTINCT) */}
+        {/* Sampling Rate */}
         {queryType !== "COUNT_DISTINCT" && (
           <div>
-            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.4rem" }}>
-              <label style={{ fontFamily: "var(--font-mono)", fontSize: "0.65rem", color: "var(--text-muted)", fontWeight: 700 }}>
-                SAMPLE RATE: {Math.round(sampleRate * 100)}%
-              </label>
-            </div>
+            <label style={{ display: "block", fontSize: "11px", color: "#94a3b8", marginBottom: "4px" }}>
+              Sample Rate: {Math.round(sampleRate * 100)}%
+            </label>
             <input
               type="range"
               min="0.01"
@@ -264,42 +231,33 @@ export default function QueryConfig({ onSubmit, loading }) {
               step="0.01"
               value={sampleRate}
               onChange={(e) => setSampleRate(parseFloat(e.target.value))}
-              style={{ width: "100%", accentColor: "#06b6d4" }}
+              style={{ width: "100%" }}
             />
           </div>
         )}
 
-        {/* Group By (Optional) */}
+        {/* Group By */}
         <div>
-          <label style={{ display: "block", fontFamily: "var(--font-mono)", fontSize: "0.65rem", color: "var(--text-muted)", fontWeight: 700, marginBottom: "0.4rem" }}>
-            GROUP BY (OPTIONAL)
+          <label style={{ display: "block", fontSize: "11px", color: "#94a3b8", marginBottom: "4px", fontWeight: 500 }}>
+            Group By (Optional)
           </label>
           <select
             value={groupBy}
             onChange={(e) => setGroupBy(e.target.value)}
-            style={{
-              width: "100%",
-              background: "#161726",
-              border: "1px solid var(--border-subtle)",
-              borderRadius: 6,
-              padding: "0.55rem 0.75rem",
-              color: "#f1f5f9",
-              fontFamily: "var(--font-mono)",
-              fontSize: "0.78rem",
-            }}
+            style={{ width: "100%", background: "#0b0f19", border: "1px solid #334155", borderRadius: "4px", padding: "6px 8px", color: "#f8fafc" }}
           >
-            <option value="">(None - Overall Aggregate)</option>
+            <option value="">None (Total Dataset)</option>
             {columns.map((c) => (
               <option key={c} value={c}>{c}</option>
             ))}
           </select>
         </div>
 
-        {/* Filter Predicates (Normalized 1NF query_filters) */}
+        {/* Predicates */}
         <div>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.4rem" }}>
-            <label style={{ fontFamily: "var(--font-mono)", fontSize: "0.65rem", color: "var(--text-muted)", fontWeight: 700 }}>
-              WHERE PREDICATES ({filters.length})
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "4px" }}>
+            <label style={{ fontSize: "11px", color: "#94a3b8", fontWeight: 500 }}>
+              WHERE Predicates ({filters.length})
             </label>
             <button
               type="button"
@@ -307,14 +265,13 @@ export default function QueryConfig({ onSubmit, loading }) {
               style={{
                 display: "flex",
                 alignItems: "center",
-                gap: "0.2rem",
+                gap: "2px",
                 background: "transparent",
-                border: "1px solid var(--border-subtle)",
-                borderRadius: 4,
-                padding: "0.2rem 0.45rem",
-                color: "#c084fc",
-                fontFamily: "var(--font-mono)",
-                fontSize: "0.6rem",
+                border: "1px solid #334155",
+                borderRadius: "3px",
+                padding: "2px 6px",
+                color: "#38bdf8",
+                fontSize: "10px",
                 cursor: "pointer"
               }}
             >
@@ -325,65 +282,60 @@ export default function QueryConfig({ onSubmit, loading }) {
           {filters.map((flt, idx) => (
             <div key={idx} style={{
               display: "grid",
-              gridTemplateColumns: "1.2fr 0.8fr 1fr auto",
-              gap: "0.3rem",
+              gridTemplateColumns: "1.1fr 0.7fr 1fr auto",
+              gap: "4px",
               alignItems: "center",
-              marginBottom: "0.4rem"
+              marginBottom: "4px"
             }}>
               <select
                 value={flt.column}
                 onChange={(e) => updateFilter(idx, "column", e.target.value)}
-                style={{ background: "#161726", border: "1px solid var(--border-subtle)", borderRadius: 4, padding: "0.35rem", color: "#e2e8f0", fontSize: "0.68rem" }}
+                style={{ padding: "4px", fontSize: "11px" }}
               >
                 {columns.map((c) => (<option key={c} value={c}>{c}</option>))}
               </select>
               <select
                 value={flt.operator}
                 onChange={(e) => updateFilter(idx, "operator", e.target.value)}
-                style={{ background: "#161726", border: "1px solid var(--border-subtle)", borderRadius: 4, padding: "0.35rem", color: "#e2e8f0", fontSize: "0.68rem" }}
+                style={{ padding: "4px", fontSize: "11px" }}
               >
                 {["=", "!=", ">", "<", ">=", "<="].map((op) => (<option key={op} value={op}>{op}</option>))}
               </select>
               <input
                 value={flt.value}
                 onChange={(e) => updateFilter(idx, "value", e.target.value)}
-                placeholder="val"
-                style={{ background: "#161726", border: "1px solid var(--border-subtle)", borderRadius: 4, padding: "0.35rem", color: "#e2e8f0", fontSize: "0.68rem" }}
+                placeholder="value"
+                style={{ padding: "4px", fontSize: "11px" }}
               />
               <button
                 type="button"
                 onClick={() => removeFilter(idx)}
-                style={{ background: "transparent", border: "none", color: "#f43f5e", cursor: "pointer", padding: "0.2rem" }}
+                style={{ background: "transparent", border: "none", color: "#ef4444", cursor: "pointer", padding: "2px" }}
               >
-                <Trash2 size={12} />
+                <X size={12} />
               </button>
             </div>
           ))}
         </div>
 
-        {/* Benchmark Toggle */}
+        {/* Benchmark Checkbox */}
         <div style={{
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          background: "#161726",
-          border: "1px solid var(--border-subtle)",
-          borderRadius: 6,
-          padding: "0.6rem 0.75rem"
+          padding: "6px 0",
+          borderTop: "1px solid #1e293b",
+          borderBottom: "1px solid #1e293b"
         }}>
           <div>
-            <div style={{ fontFamily: "var(--font-sans)", fontSize: "0.72rem", color: "#e2e8f0", fontWeight: 600 }}>
-              Exact Comparison Run
-            </div>
-            <div style={{ fontFamily: "var(--font-mono)", fontSize: "0.6rem", color: "var(--text-dim)" }}>
-              Computes 100% exact scan for error analysis
-            </div>
+            <div style={{ fontSize: "11px", color: "#f8fafc", fontWeight: 500 }}>Exact Benchmark</div>
+            <div style={{ fontSize: "10px", color: "#64748b" }}>Run full table scan to measure error</div>
           </div>
           <input
             type="checkbox"
             checked={runBenchmark}
             onChange={(e) => setRunBenchmark(e.target.checked)}
-            style={{ width: 16, height: 16, accentColor: "#a855f7", cursor: "pointer" }}
+            style={{ width: 14, height: 14, cursor: "pointer" }}
           />
         </div>
 
@@ -392,37 +344,24 @@ export default function QueryConfig({ onSubmit, loading }) {
           type="submit"
           disabled={loading}
           style={{
-            marginTop: "0.5rem",
-            background: "linear-gradient(135deg, #7c3aed 0%, #a855f7 100%)",
-            border: "none",
-            borderRadius: 8,
-            padding: "0.85rem",
-            fontFamily: "var(--font-mono)",
-            fontSize: "0.78rem",
-            fontWeight: 700,
-            letterSpacing: "0.08em",
-            color: "#fff",
+            marginTop: "4px",
+            background: "#2563eb",
+            border: "1px solid #1d4ed8",
+            borderRadius: "4px",
+            padding: "8px 12px",
+            fontSize: "12px",
+            fontWeight: 500,
+            color: "#ffffff",
             cursor: loading ? "not-allowed" : "pointer",
-            boxShadow: "0 4px 16px rgba(124, 58, 237, 0.4)",
             opacity: loading ? 0.6 : 1,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            gap: "0.5rem",
-            transition: "all 0.2s ease"
+            gap: "6px"
           }}
         >
-          {loading ? (
-            <>
-              <div style={{ width: 14, height: 14, border: "2px solid #fff", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
-              EXECUTING IN ENGINE...
-            </>
-          ) : (
-            <>
-              <Cpu size={15} />
-              RUN APPROXIMATE QUERY
-            </>
-          )}
+          <Play size={12} fill="#fff" />
+          {loading ? "Executing Query..." : "Execute Query"}
         </button>
       </form>
     </aside>
