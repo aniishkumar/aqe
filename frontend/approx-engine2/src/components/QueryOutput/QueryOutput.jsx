@@ -1,4 +1,4 @@
-import { Database } from "lucide-react";
+import { Terminal } from "lucide-react";
 
 export default function QueryOutput({ result }) {
   if (!result) return null;
@@ -17,97 +17,127 @@ export default function QueryOutput({ result }) {
 
   return (
     <section style={{
-      background: "#0f172a",
-      border: "1px solid #1e293b",
-      borderRadius: "4px",
-      padding: "14px",
-      marginBottom: "16px"
+      background: "var(--bg-panel)",
+      border: "var(--border)",
+      padding: "12px 14px",
+      marginBottom: "14px"
     }}>
-      {/* SQL Statement Header */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px", gap: "8px", flexWrap: "wrap" }}>
-        <span style={{ fontSize: "12px", fontWeight: 600, color: "#f8fafc" }}>
-          Query Output
-        </span>
+      {/* SQL Snippet in Black Inset Box */}
+      <div style={{ marginBottom: "12px" }}>
+        <div style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: "4px"
+        }}>
+          <span className="pixel-tag">
+            QUERY_OUTPUT // SQL_STATEMENT
+          </span>
+          <span style={{ fontFamily: "var(--font-code)", fontSize: "10px", color: "var(--text-muted)" }}>
+            TARGET_FIELD: {result.column || "fare_amount"}
+          </span>
+        </div>
 
         {result.query_text && (
-          <code style={{
-            fontFamily: "var(--font-mono)",
+          <div style={{
+            background: "var(--bg-page)",
+            border: "1px solid rgba(255, 255, 255, 0.2)",
+            padding: "8px 10px",
+            fontFamily: "var(--font-code)",
             fontSize: "11px",
-            background: "#0b0f19",
-            border: "1px solid #1e293b",
-            borderRadius: "3px",
-            padding: "4px 8px",
-            color: "#94a3b8"
+            color: "var(--accent-orange)",
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+            overflowX: "auto"
           }}>
-            {result.query_text}
-          </code>
+            <span style={{ color: "var(--text-muted)" }}>AQE&gt;</span>
+            <span>{result.query_text}</span>
+          </div>
         )}
       </div>
 
-      {/* Main Single Result Comparison */}
+      {/* Main Single Result Comparison - Two Navy Panels */}
       {!isGrouped ? (
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
-          {/* Exact Benchmark */}
+          {/* Panel 1: Exact Value */}
           <div style={{
-            background: "#0b0f19",
-            border: "1px solid #1e293b",
-            borderRadius: "4px",
-            padding: "12px"
+            background: "var(--bg-panel-alt)",
+            border: "1px solid rgba(255, 255, 255, 0.15)",
+            padding: "12px 14px",
+            display: "flex",
+            flexDirection: "column",
+            gap: "6px"
           }}>
-            <div style={{ fontSize: "11px", color: "#94a3b8", marginBottom: "2px" }}>
-              Exact Value (Ground Truth)
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <span className="pixel-tag" style={{ background: "var(--bg-panel-alt)", color: "var(--text-primary)", border: "var(--border)" }}>
+                GROUND_TRUTH // EXACT_COUNT
+              </span>
+              <span style={{ fontFamily: "var(--font-code)", fontSize: "10px", color: "var(--text-muted)" }}>
+                [FULL_SCAN]
+              </span>
             </div>
+
             <div style={{
               fontFamily: "var(--font-mono)",
-              fontSize: "24px",
-              fontWeight: 600,
-              color: "#f8fafc"
+              fontSize: "46px",
+              lineHeight: 1,
+              fontWeight: 700,
+              color: "var(--text-primary)",
+              letterSpacing: "0.02em"
             }}>
               {fmt(exactVal)}
             </div>
-            <div style={{ fontSize: "10px", color: "#64748b", marginTop: "4px" }}>
-              {result.exact_time_ms ? `Scanned in ${result.exact_time_ms.toFixed(2)} ms` : "Full table benchmark"}
+
+            <div style={{ fontFamily: "var(--font-code)", fontSize: "10px", color: "var(--text-muted)" }}>
+              {result.exact_time_ms ? `SCANNED IN ${result.exact_time_ms.toFixed(2)} MS` : "BENCHMARK EVALUATION"}
             </div>
           </div>
 
-          {/* Approximate Estimate */}
+          {/* Panel 2: Approximate Estimate */}
           <div style={{
-            background: "#0b0f19",
-            border: "1px solid #2563eb44",
-            borderRadius: "4px",
-            padding: "12px"
+            background: "var(--bg-panel-alt)",
+            border: "2px solid var(--accent-orange)",
+            padding: "12px 14px",
+            display: "flex",
+            flexDirection: "column",
+            gap: "6px"
           }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2px" }}>
-              <span style={{ fontSize: "11px", color: "#60a5fa" }}>
-                Approximate Estimate (AQE)
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <span className="pixel-tag">
+                AQE_ESTIMATE // HLL++
               </span>
-              <span style={{ fontSize: "10px", fontFamily: "var(--font-mono)", color: "#64748b" }}>
-                p = {result.precision_p || 10}
+              <span style={{ fontFamily: "var(--font-pixel)", fontSize: "9px", color: "var(--accent-orange)" }}>
+                [p={result.precision_p || 10} | m={result.register_count || 1024}]
               </span>
             </div>
+
             <div style={{
               fontFamily: "var(--font-mono)",
-              fontSize: "24px",
-              fontWeight: 600,
-              color: "#ffffff"
+              fontSize: "46px",
+              lineHeight: 1,
+              fontWeight: 700,
+              color: "var(--accent-orange)",
+              letterSpacing: "0.02em"
             }}>
               {fmt(approxVal)}
             </div>
-            <div style={{ fontSize: "10px", color: "#3b82f6", marginTop: "4px" }}>
-              Estimated in {result.approx_time_ms?.toFixed(2)} ms
+
+            <div style={{ fontFamily: "var(--font-code)", fontSize: "10px", color: "var(--up)" }}>
+              CALCULATED IN {result.approx_time_ms?.toFixed(2)} MS
             </div>
           </div>
         </div>
       ) : (
         /* Grouped Results Table */
-        <div style={{ overflowX: "auto", border: "1px solid #1e293b", borderRadius: "3px" }}>
+        <div style={{ border: "var(--border)", overflowX: "auto" }}>
           <table>
             <thead>
               <tr>
-                <th>Group Key</th>
-                <th style={{ textAlign: "right" }}>Exact Count</th>
-                <th style={{ textAlign: "right" }}>Approx Estimate</th>
-                <th style={{ textAlign: "right" }}>Deviation %</th>
+                <th>GROUP_KEY</th>
+                <th style={{ textAlign: "right" }}>EXACT_COUNT</th>
+                <th style={{ textAlign: "right" }}>APPROX_ESTIMATE</th>
+                <th style={{ textAlign: "right" }}>DEVIATION_%</th>
               </tr>
             </thead>
             <tbody>
@@ -116,10 +146,21 @@ export default function QueryOutput({ result }) {
                 const err = exCount ? Math.abs((appCount - exCount) / exCount * 100).toFixed(2) : "—";
                 return (
                   <tr key={grpKey}>
-                    <td style={{ fontWeight: 500 }}>{grpKey}</td>
-                    <td className="mono" style={{ textAlign: "right", color: "#94a3b8" }}>{fmt(exCount)}</td>
-                    <td className="mono" style={{ textAlign: "right", color: "#f8fafc", fontWeight: 500 }}>{fmt(appCount)}</td>
-                    <td className="mono" style={{ textAlign: "right", color: parseFloat(err) < 4 ? "#16a34a" : "#d97706" }}>
+                    <td style={{ fontFamily: "var(--font-pixel)", fontSize: "9px", color: "var(--accent-orange)" }}>
+                      {grpKey}
+                    </td>
+                    <td style={{ textAlign: "right", fontFamily: "var(--font-mono)", fontSize: "18px", color: "var(--text-muted)" }}>
+                      {fmt(exCount)}
+                    </td>
+                    <td style={{ textAlign: "right", fontFamily: "var(--font-mono)", fontSize: "18px", color: "var(--text-primary)" }}>
+                      {fmt(appCount)}
+                    </td>
+                    <td style={{
+                      textAlign: "right",
+                      fontFamily: "var(--font-mono)",
+                      fontSize: "18px",
+                      color: parseFloat(err) < 4 ? "var(--up)" : "var(--down)"
+                    }}>
                       {err !== "—" ? `${err}%` : "—"}
                     </td>
                   </tr>
@@ -130,22 +171,23 @@ export default function QueryOutput({ result }) {
         </div>
       )}
 
-      {/* Relational Persistence Info */}
+      {/* Retro Status Inset Footer */}
       <div style={{
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
         marginTop: "12px",
-        paddingTop: "8px",
-        borderTop: "1px solid #1e293b",
-        fontSize: "11px",
-        color: "#64748b"
+        paddingTop: "6px",
+        borderTop: "var(--border)",
+        fontFamily: "var(--font-code)",
+        fontSize: "10px",
+        color: "var(--text-muted)"
       }}>
         <div>
-          Persisted: <code>query_requests</code> (id: {result.query_id}) &rarr; <code>query_results</code>
+          [PERSISTED: <code>query_requests(id:{result.query_id})</code> &rarr; <code>query_results</code>]
         </div>
         <div>
-          Target: <code>{result.column}</code> | Rows Scanned: <code>{result.rows_processed?.toLocaleString() || "100,000"}</code>
+          SCANNED: <code>{result.rows_processed?.toLocaleString() || "100,000"}</code> ROWS
         </div>
       </div>
     </section>

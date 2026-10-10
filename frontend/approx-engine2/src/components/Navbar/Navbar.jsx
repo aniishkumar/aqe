@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { getHome } from "../../api";
-import { Database, Terminal, Layers, GitMerge, BarChart2, BookOpen } from "lucide-react";
+import { Terminal, Layers, GitMerge, BarChart2, BookOpen, Activity } from "lucide-react";
 
 export default function Navbar({ activeTab, setActiveTab }) {
   const [online, setOnline] = useState(null);
@@ -18,54 +18,55 @@ export default function Navbar({ activeTab, setActiveTab }) {
   }, []);
 
   const navItems = [
-    { id: "query", label: "Query Console", icon: Terminal },
-    { id: "registers", label: "HLL Registers", icon: Layers },
-    { id: "merge", label: "Merge Lineage", icon: GitMerge },
-    { id: "analytics", label: "Workload Analytics", icon: BarChart2 },
-    { id: "docs", label: "Schema & Docs", icon: BookOpen },
+    { id: "query", label: "QUERY CONSOLE", icon: Terminal },
+    { id: "registers", label: "HLL REGISTERS", icon: Layers },
+    { id: "merge", label: "MERGE LINEAGE", icon: GitMerge },
+    { id: "analytics", label: "WORKLOAD ANALYTICS", icon: BarChart2 },
+    { id: "docs", label: "SCHEMA & DOCS", icon: BookOpen },
   ];
 
   return (
     <header style={{
       display: "flex",
-      alignItems: "center",
+      alignItems: "stretch",
       justifyContent: "space-between",
-      padding: "0 16px",
-      height: "48px",
-      background: "#0f172a",
-      borderBottom: "1px solid #1e293b",
+      padding: "0 12px",
+      height: "44px",
+      background: "var(--nav-red)",
+      borderBottom: "2px solid var(--bg-page)",
       position: "sticky",
       top: 0,
       zIndex: 100,
     }}>
-      {/* Brand & Project Identity */}
-      <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+      {/* Brand & Terminal Header */}
+      <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
         <div style={{
+          background: "var(--accent-orange)",
+          color: "var(--text-on-orange)",
+          fontFamily: "var(--font-pixel)",
+          fontSize: "11px",
+          fontWeight: 700,
+          padding: "4px 8px",
+          letterSpacing: "0.05em",
           display: "flex",
           alignItems: "center",
-          gap: "8px",
-          color: "#f8fafc",
-          fontWeight: 600,
-          fontSize: "13px"
+          gap: "6px"
         }}>
-          <Database size={16} color="#3b82f6" />
-          <span>AQE Console</span>
+          <Activity size={12} strokeWidth={3} />
+          <span>AQE_TERM v1.0</span>
         </div>
         <span style={{
-          background: "#1e293b",
-          border: "1px solid #334155",
-          borderRadius: "3px",
-          padding: "2px 6px",
-          fontFamily: "var(--font-mono)",
-          fontSize: "11px",
-          color: "#94a3b8"
+          fontFamily: "var(--font-code)",
+          fontSize: "10px",
+          color: "rgba(255, 255, 255, 0.85)",
+          letterSpacing: "0.04em"
         }}>
-          PostgreSQL / HLL++
+          [POSTGRES/HLL++]
         </span>
       </div>
 
-      {/* Tabs */}
-      <nav style={{ display: "flex", alignItems: "center", height: "100%", gap: "4px" }}>
+      {/* Nav Items */}
+      <nav style={{ display: "flex", alignItems: "stretch", height: "100%", gap: "2px" }}>
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = activeTab === item.id;
@@ -77,44 +78,47 @@ export default function Navbar({ activeTab, setActiveTab }) {
                 display: "flex",
                 alignItems: "center",
                 gap: "6px",
-                padding: "0 12px",
+                padding: "0 14px",
                 height: "100%",
-                background: "transparent",
+                background: isActive ? "var(--nav-red-hover)" : "transparent",
                 border: "none",
-                borderBottom: isActive ? "2px solid #3b82f6" : "2px solid transparent",
-                color: isActive ? "#ffffff" : "#94a3b8",
-                fontSize: "12px",
-                fontWeight: isActive ? 500 : 400,
+                borderBottom: isActive ? "3px solid var(--text-primary)" : "3px solid transparent",
+                color: isActive ? "var(--text-primary)" : "rgba(255, 255, 255, 0.75)",
+                fontFamily: "var(--font-pixel)",
+                fontSize: "10px",
+                letterSpacing: "0.05em",
+                textTransform: "uppercase",
                 cursor: "pointer",
-                transition: "color 0.15s ease",
+                transition: "background 0.1s ease, color 0.1s ease",
               }}
             >
-              <Icon size={14} color={isActive ? "#3b82f6" : "#64748b"} />
-              {item.label}
+              <Icon size={12} strokeWidth={2.5} color={isActive ? "var(--accent-orange)" : "currentColor"} />
+              <span>{item.label}</span>
             </button>
           );
         })}
       </nav>
 
       {/* Status Bar */}
-      <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
         <div style={{
           display: "flex",
           alignItems: "center",
           gap: "6px",
-          fontSize: "11px",
-          color: "#94a3b8"
+          background: "var(--bg-page)",
+          border: "1px solid rgba(255, 255, 255, 0.2)",
+          padding: "3px 8px",
+          fontFamily: "var(--font-pixel)",
+          fontSize: "9px",
         }}>
           <span style={{
-            width: 7,
-            height: 7,
-            borderRadius: "50%",
-            background: online === true ? "#16a34a" : online === false ? "#dc2626" : "#64748b",
+            width: "6px",
+            height: "6px",
+            background: online === true ? "var(--up)" : online === false ? "var(--down)" : "var(--text-muted)",
             display: "inline-block",
           }} />
-          <span>Catalog:</span>
-          <span style={{ color: online ? "#f8fafc" : "#dc2626", fontWeight: 500 }}>
-            {online === null ? "Connecting..." : online ? "Connected" : "Offline"}
+          <span style={{ color: online ? "var(--up)" : "var(--down)" }}>
+            {online === null ? "CONNECTING" : online ? "CATALOG:ONLINE" : "OFFLINE"}
           </span>
         </div>
       </div>

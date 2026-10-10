@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { getWorkloadAnalytics, getAccuracyAnalytics, getPrecisionSweep, getQueryHistory } from "../../api";
-import { RefreshCw } from "lucide-react";
+import { RefreshCw, Activity, Terminal } from "lucide-react";
 
 export default function AnalyticsDashboard() {
   const [workload, setWorkload] = useState([]);
@@ -30,16 +30,46 @@ export default function AnalyticsDashboard() {
   }, []);
 
   return (
-    <div style={{ padding: "16px 20px", display: "flex", flexDirection: "column", gap: "14px" }}>
+    <div style={{ padding: "16px 20px", display: "flex", flexDirection: "column", gap: "14px", background: "var(--bg-page)", minHeight: "calc(100vh - 48px)" }}>
       {/* Title Bar */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid #1e293b", paddingBottom: "10px" }}>
-        <div>
-          <h2 style={{ fontSize: "14px", fontWeight: 600, color: "#f8fafc", margin: 0 }}>
-            Analytical Workload &amp; Precision Evaluation
-          </h2>
-          <p style={{ fontSize: "11px", color: "#64748b", margin: 0 }}>
-            SQL aggregation benchmarks corresponding to Section 8.9 of BCSE302P Assessment 6.
-          </p>
+      <div style={{
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        borderBottom: "var(--border)",
+        paddingBottom: "10px",
+        flexWrap: "wrap",
+        gap: "8px"
+      }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          <div style={{
+            padding: "4px 8px",
+            border: "1px solid var(--accent-orange)",
+            background: "var(--bg-page)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center"
+          }}>
+            <Activity size={16} color="var(--accent-orange)" strokeWidth={2} />
+          </div>
+          <div>
+            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+              <h2 style={{
+                fontSize: "13px",
+                fontFamily: "var(--font-pixel)",
+                color: "var(--accent-orange)",
+                letterSpacing: "0.05em",
+                margin: 0,
+                textTransform: "uppercase"
+              }}>
+                Workload Analytics &amp; Precision Evaluation
+              </h2>
+              <span className="pixel-tag">BCSE302P SECTION 8.9</span>
+            </div>
+            <p style={{ fontSize: "11px", color: "var(--text-muted)", margin: "2px 0 0 0" }}>
+              HyperLogLog speedup vs standard deviation convergence across variable register granularities.
+            </p>
+          </div>
         </div>
 
         <button
@@ -47,46 +77,47 @@ export default function AnalyticsDashboard() {
           style={{
             display: "flex",
             alignItems: "center",
-            gap: "4px",
-            background: "#1e293b",
-            border: "1px solid #334155",
-            borderRadius: "4px",
-            padding: "4px 10px",
-            fontSize: "11px",
-            color: "#94a3b8",
-            cursor: "pointer"
+            gap: "6px",
+            background: "var(--bg-panel)",
+            border: "1px solid var(--accent-orange)",
+            color: "var(--accent-orange)",
+            fontFamily: "var(--font-pixel)",
+            fontSize: "10px",
+            padding: "5px 10px",
+            cursor: "pointer",
+            letterSpacing: "0.05em",
+            textTransform: "uppercase"
           }}
         >
-          <RefreshCw size={11} /> Refresh
+          <RefreshCw size={11} /> REFRESH METRICS
         </button>
       </div>
 
       {/* Section 8.9 Query 5: Precision Sweep */}
       <div style={{
-        background: "#0f172a",
-        border: "1px solid #1e293b",
-        borderRadius: "4px",
+        background: "var(--bg-panel)",
+        border: "var(--border)",
         padding: "14px"
       }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px", flexWrap: "wrap", gap: "6px" }}>
-          <div>
-            <div style={{ fontSize: "12px", fontWeight: 600, color: "#f8fafc" }}>
-              Precision Parameter Sweep (p &isin; [8, 16])
-            </div>
-            <div style={{ fontSize: "10px", color: "#64748b" }}>
-              Evaluation of speed vs accuracy trade-off on column '{sweepCol}'
-            </div>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px", flexWrap: "wrap", gap: "8px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <span className="pixel-tag">PRECISION SWEEP</span>
+            <span style={{ fontSize: "11px", color: "var(--text-muted)", fontFamily: "var(--font-code)" }}>
+              p &isin; [8, 16] &bull; Speedup vs Error convergence evaluation
+            </span>
           </div>
 
-          <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-            <span style={{ fontSize: "11px", color: "#64748b" }}>Column:</span>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <span style={{ fontSize: "9px", fontFamily: "var(--font-pixel)", color: "var(--accent-orange)", textTransform: "uppercase" }}>
+              TARGET COLUMN:
+            </span>
             <select
               value={sweepCol}
               onChange={(e) => {
                 setSweepCol(e.target.value);
                 runSweep(e.target.value);
               }}
-              style={{ padding: "3px 6px", fontSize: "11px" }}
+              style={{ padding: "4px 8px", background: "var(--bg-page)", border: "var(--border)" }}
             >
               <option value="fare_amount">fare_amount</option>
               <option value="trip_distance">trip_distance</option>
@@ -97,68 +128,96 @@ export default function AnalyticsDashboard() {
         </div>
 
         {loadingSweep ? (
-          <div style={{ padding: "20px", textAlign: "center", color: "#64748b", fontSize: "11px" }}>
-            Evaluating precision sweeps...
+          <div style={{ padding: "30px", textAlign: "center", color: "var(--accent-orange)", fontSize: "12px", fontFamily: "var(--font-pixel)" }}>
+            [COMPUTING PRECISION SWEEPS...]
           </div>
         ) : sweep?.sweep ? (
-          <div style={{ overflowX: "auto", border: "1px solid #1e293b", borderRadius: "3px" }}>
+          <div style={{ overflowX: "auto", border: "var(--border)" }}>
             <table>
               <thead>
                 <tr>
-                  <th>Precision (p)</th>
-                  <th>Registers (m=2^p)</th>
-                  <th style={{ textAlign: "right" }}>Theoretical Std Error</th>
-                  <th style={{ textAlign: "right" }}>Observed Error</th>
-                  <th style={{ textAlign: "right" }}>Estimated Count</th>
-                  <th style={{ textAlign: "right" }}>Latency</th>
-                  <th style={{ textAlign: "right" }}>Speedup</th>
+                  <th>PRECISION (p)</th>
+                  <th>REGISTERS (m=2^p)</th>
+                  <th style={{ textAlign: "right" }}>THEORETICAL STD ERR</th>
+                  <th style={{ textAlign: "right" }}>OBSERVED ERROR</th>
+                  <th style={{ textAlign: "right" }}>ESTIMATED COUNT</th>
+                  <th style={{ textAlign: "right" }}>LATENCY</th>
+                  <th style={{ textAlign: "right" }}>SPEEDUP</th>
                 </tr>
               </thead>
               <tbody>
                 {sweep.sweep.map((row) => (
                   <tr key={row.p}>
-                    <td className="mono" style={{ fontWeight: 600 }}>p = {row.p}</td>
-                    <td className="mono" style={{ color: "#94a3b8" }}>{row.register_count.toLocaleString()} B</td>
-                    <td className="mono" style={{ textAlign: "right", color: "#38bdf8" }}>&plusmn;{row.theoretical_error_pct}%</td>
-                    <td className="mono" style={{ textAlign: "right", color: row.observed_error_pct < 3 ? "#16a34a" : "#d97706", fontWeight: 600 }}>
-                      {row.observed_error_pct.toFixed(2)}%
+                    <td style={{ color: "var(--accent-orange)", fontWeight: 700 }}>p = {row.p}</td>
+                    <td style={{ color: "var(--text-muted)" }}>{row.register_count.toLocaleString()} B</td>
+                    <td style={{ textAlign: "right", color: "var(--star)" }}>&plusmn;{row.theoretical_error_pct}%</td>
+                    <td style={{
+                      textAlign: "right",
+                      color: row.observed_error_pct < 3 ? "var(--up)" : "var(--down)",
+                      fontWeight: 700
+                    }}>
+                      {row.observed_error_pct < 3 ? "▲ " : "▼ "}{row.observed_error_pct.toFixed(2)}%
                     </td>
-                    <td className="mono" style={{ textAlign: "right", color: "#f8fafc" }}>{row.estimated_cardinality.toLocaleString()}</td>
-                    <td className="mono" style={{ textAlign: "right", color: "#94a3b8" }}>{row.latency_ms} ms</td>
-                    <td className="mono" style={{ textAlign: "right", color: "#f8fafc", fontWeight: 600 }}>{row.speedup}x</td>
+                    <td style={{ textAlign: "right", color: "var(--text-primary)", fontFamily: "var(--font-mono)", fontSize: "15px" }}>
+                      {row.estimated_cardinality.toLocaleString()}
+                    </td>
+                    <td style={{ textAlign: "right", color: "var(--text-muted)" }}>{row.latency_ms} ms</td>
+                    <td style={{
+                      textAlign: "right",
+                      color: row.speedup >= 1.0 ? "var(--up)" : "var(--down)",
+                      fontFamily: "var(--font-mono)",
+                      fontSize: "16px",
+                      fontWeight: 700
+                    }}>
+                      {row.speedup >= 1.0 ? "▲ " : "▼ "}{row.speedup}x
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
-            <div style={{ padding: "6px 10px", fontSize: "11px", color: "#64748b", textAlign: "right", borderTop: "1px solid #1e293b" }}>
-              Exact Distinct Count: <strong style={{ color: "#f8fafc" }}>{sweep.exact_cardinality?.toLocaleString()}</strong> (evaluated in {sweep.exact_time_ms?.toFixed(2)} ms)
+            <div style={{
+              padding: "8px 12px",
+              fontSize: "12px",
+              color: "var(--text-muted)",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              background: "var(--bg-panel-alt)",
+              borderTop: "var(--border)"
+            }}>
+              <span>GROUND TRUTH BENCHMARK</span>
+              <span>
+                EXACT DISTINCT COUNT: <strong style={{ color: "var(--accent-orange)", fontFamily: "var(--font-mono)", fontSize: "16px" }}>{sweep.exact_cardinality?.toLocaleString()}</strong>
+                <span style={{ marginLeft: "12px", color: "var(--text-muted)" }}>({sweep.exact_time_ms?.toFixed(2)} ms)</span>
+              </span>
             </div>
           </div>
         ) : null}
       </div>
 
       {/* Grid: Workload (Query 2) & Accuracy (Query 3) */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
         {/* Workload */}
-        <div style={{ background: "#0f172a", border: "1px solid #1e293b", borderRadius: "4px", padding: "12px" }}>
-          <div style={{ fontSize: "12px", fontWeight: 600, color: "#f8fafc", marginBottom: "8px" }}>
-            Dataset Workload (SQL Query 2)
+        <div style={{ background: "var(--bg-panel)", border: "var(--border)", padding: "14px" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "10px" }}>
+            <span className="pixel-tag">DATASET WORKLOAD</span>
+            <span style={{ fontSize: "10px", color: "var(--text-muted)", fontFamily: "var(--font-code)" }}>SQL QUERY 2</span>
           </div>
-          <div style={{ border: "1px solid #1e293b", borderRadius: "3px", overflowX: "auto" }}>
+          <div style={{ border: "var(--border)", overflowX: "auto" }}>
             <table>
               <thead>
                 <tr>
-                  <th>Dataset</th>
-                  <th style={{ textAlign: "right" }}>Total Queries</th>
-                  <th style={{ textAlign: "right" }}>Avg Latency</th>
+                  <th>DATASET</th>
+                  <th style={{ textAlign: "right" }}>QUERIES</th>
+                  <th style={{ textAlign: "right" }}>AVG LATENCY</th>
                 </tr>
               </thead>
               <tbody>
                 {workload.map((w) => (
                   <tr key={w.dataset_id}>
-                    <td>{w.dataset_name}</td>
-                    <td className="mono" style={{ textAlign: "right", color: "#f8fafc" }}>{w.query_count}</td>
-                    <td className="mono" style={{ textAlign: "right", color: "#94a3b8" }}>{w.avg_latency_ms.toFixed(2)} ms</td>
+                    <td style={{ color: "var(--text-primary)" }}>{w.dataset_name}</td>
+                    <td style={{ textAlign: "right", color: "var(--accent-orange)", fontFamily: "var(--font-mono)", fontSize: "16px" }}>{w.query_count}</td>
+                    <td style={{ textAlign: "right", color: "var(--text-muted)" }}>{w.avg_latency_ms.toFixed(2)} ms</td>
                   </tr>
                 ))}
               </tbody>
@@ -167,30 +226,35 @@ export default function AnalyticsDashboard() {
         </div>
 
         {/* Historical Accuracy */}
-        <div style={{ background: "#0f172a", border: "1px solid #1e293b", borderRadius: "4px", padding: "12px" }}>
-          <div style={{ fontSize: "12px", fontWeight: 600, color: "#f8fafc", marginBottom: "8px" }}>
-            Historical Error Observations (SQL Query 3)
+        <div style={{ background: "var(--bg-panel)", border: "var(--border)", padding: "14px" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "10px" }}>
+            <span className="pixel-tag">HISTORICAL ACCURACY</span>
+            <span style={{ fontSize: "10px", color: "var(--text-muted)", fontFamily: "var(--font-code)" }}>SQL QUERY 3</span>
           </div>
-          <div style={{ maxHeight: "180px", overflowY: "auto", border: "1px solid #1e293b", borderRadius: "3px" }}>
+          <div style={{ maxHeight: "200px", overflowY: "auto", border: "var(--border)" }}>
             <table>
               <thead style={{ position: "sticky", top: 0 }}>
                 <tr>
                   <th>QID</th>
-                  <th>Precision</th>
-                  <th style={{ textAlign: "right" }}>Exact</th>
-                  <th style={{ textAlign: "right" }}>Approx</th>
-                  <th style={{ textAlign: "right" }}>Observed Error</th>
+                  <th>P</th>
+                  <th style={{ textAlign: "right" }}>EXACT</th>
+                  <th style={{ textAlign: "right" }}>APPROX</th>
+                  <th style={{ textAlign: "right" }}>ERROR</th>
                 </tr>
               </thead>
               <tbody>
                 {accuracy.map((a) => (
                   <tr key={a.query_id}>
-                    <td className="mono" style={{ color: "#64748b" }}>#{a.query_id}</td>
-                    <td className="mono" style={{ color: "#64748b" }}>p={a.precision_p}</td>
-                    <td className="mono" style={{ textAlign: "right", color: "#94a3b8" }}>{a.exact_cardinality?.toLocaleString()}</td>
-                    <td className="mono" style={{ textAlign: "right", color: "#f8fafc" }}>{a.estimated_cardinality?.toLocaleString()}</td>
-                    <td className="mono" style={{ textAlign: "right", color: a.error_percent < 3 ? "#16a34a" : "#d97706", fontWeight: 600 }}>
-                      {a.error_percent?.toFixed(2)}%
+                    <td style={{ color: "var(--accent-orange)", fontWeight: 700 }}>#{a.query_id}</td>
+                    <td style={{ color: "var(--text-muted)" }}>p={a.precision_p}</td>
+                    <td style={{ textAlign: "right", color: "var(--text-muted)" }}>{a.exact_cardinality?.toLocaleString()}</td>
+                    <td style={{ textAlign: "right", color: "var(--text-primary)" }}>{a.estimated_cardinality?.toLocaleString()}</td>
+                    <td style={{
+                      textAlign: "right",
+                      color: a.error_percent < 3 ? "var(--up)" : "var(--down)",
+                      fontWeight: 700
+                    }}>
+                      {a.error_percent < 3 ? "▲ " : "▼ "}{a.error_percent?.toFixed(2)}%
                     </td>
                   </tr>
                 ))}
@@ -201,45 +265,52 @@ export default function AnalyticsDashboard() {
       </div>
 
       {/* Query Request History Table */}
-      <div style={{ background: "#0f172a", border: "1px solid #1e293b", borderRadius: "4px", padding: "12px" }}>
-        <div style={{ fontSize: "12px", fontWeight: 600, color: "#f8fafc", marginBottom: "8px" }}>
-          Query Requests Catalog (PostgreSQL Table: <code>query_requests</code>)
+      <div style={{ background: "var(--bg-panel)", border: "var(--border)", padding: "14px" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "10px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <span className="pixel-tag">QUERY REQUESTS CATALOG</span>
+            <span style={{ fontSize: "11px", color: "var(--text-muted)", fontFamily: "var(--font-code)" }}>
+              PostgreSQL Relation: query_requests
+            </span>
+          </div>
+          <span style={{ fontSize: "13px", fontFamily: "var(--font-mono)", color: "var(--accent-orange)" }}>
+            [{history.length} ENTRIES]
+          </span>
         </div>
-        <div style={{ overflowX: "auto", border: "1px solid #1e293b", borderRadius: "3px" }}>
+        <div style={{ overflowX: "auto", border: "var(--border)" }}>
           <table>
             <thead>
               <tr>
-                <th>query_id</th>
-                <th>User</th>
-                <th>Operation</th>
-                <th>Column</th>
-                <th style={{ textAlign: "right" }}>Estimate</th>
-                <th style={{ textAlign: "right" }}>Latency</th>
-                <th style={{ textAlign: "center" }}>Status</th>
+                <th>QUERY_ID</th>
+                <th>USER</th>
+                <th>OPERATION</th>
+                <th>TARGET_COLUMN</th>
+                <th style={{ textAlign: "right" }}>ESTIMATE</th>
+                <th style={{ textAlign: "right" }}>LATENCY</th>
+                <th style={{ textAlign: "center" }}>STATUS</th>
               </tr>
             </thead>
             <tbody>
               {history.map((h) => (
                 <tr key={h.query_id}>
-                  <td className="mono" style={{ color: "#64748b" }}>#{h.query_id}</td>
-                  <td style={{ color: "#94a3b8" }}>{h.user}</td>
-                  <td className="mono" style={{ color: "#38bdf8" }}>{h.operation}</td>
-                  <td className="mono">{h.target_column}</td>
-                  <td className="mono" style={{ textAlign: "right", color: "#f8fafc", fontWeight: 500 }}>
+                  <td style={{ color: "var(--accent-orange)", fontWeight: 700 }}>#{h.query_id}</td>
+                  <td style={{ color: "var(--text-muted)" }}>{h.user}</td>
+                  <td style={{ color: "var(--star)" }}>{h.operation}</td>
+                  <td style={{ color: "var(--text-primary)" }}>{h.target_column}</td>
+                  <td style={{ textAlign: "right", color: "var(--text-primary)", fontFamily: "var(--font-mono)", fontSize: "15px" }}>
                     {h.estimated_cardinality?.toLocaleString() || "—"}
                   </td>
-                  <td className="mono" style={{ textAlign: "right", color: "#94a3b8" }}>
+                  <td style={{ textAlign: "right", color: "var(--text-muted)" }}>
                     {h.latency_ms != null ? `${h.latency_ms.toFixed(2)} ms` : "—"}
                   </td>
                   <td style={{ textAlign: "center" }}>
                     <span style={{
-                      background: h.status === "COMPLETED" ? "#16a34a22" : "#dc262622",
-                      color: h.status === "COMPLETED" ? "#16a34a" : "#dc2626",
-                      fontSize: "10px",
-                      fontFamily: "var(--font-mono)",
-                      padding: "1px 6px",
-                      borderRadius: "2px",
-                      border: "1px solid " + (h.status === "COMPLETED" ? "#16a34a44" : "#dc262644")
+                      background: h.status === "COMPLETED" ? "rgba(46, 230, 46, 0.12)" : "rgba(255, 59, 59, 0.12)",
+                      color: h.status === "COMPLETED" ? "var(--up)" : "var(--down)",
+                      fontSize: "9px",
+                      fontFamily: "var(--font-pixel)",
+                      padding: "2px 6px",
+                      border: "1px solid " + (h.status === "COMPLETED" ? "var(--up)" : "var(--down)")
                     }}>
                       {h.status}
                     </span>

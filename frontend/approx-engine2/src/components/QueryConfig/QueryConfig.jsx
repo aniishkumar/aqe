@@ -15,6 +15,19 @@ export default function QueryConfig({ onSubmit, loading }) {
   const [runBenchmark, setRunBenchmark] = useState(true);
   const [filters, setFilters] = useState([]);
 
+  // Accordion state
+  const [sections, setSections] = useState({
+    op: true,
+    col: true,
+    prec: true,
+    grp: false,
+    where: true,
+  });
+
+  const toggleSection = (key) => {
+    setSections((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
+
   useEffect(() => {
     getDataInfo().then((res) => {
       setDataInfo(res);
@@ -64,166 +77,252 @@ export default function QueryConfig({ onSubmit, loading }) {
 
   return (
     <aside style={{
-      width: 290,
-      minWidth: 280,
-      background: "#0f172a",
-      borderRight: "1px solid #1e293b",
-      padding: "16px",
+      width: "310px",
+      minWidth: "290px",
+      background: "var(--bg-page)",
+      borderRight: "var(--border)",
+      padding: "12px",
       display: "flex",
       flexDirection: "column",
-      gap: "14px",
-      height: "calc(100vh - 48px)",
+      gap: "10px",
+      height: "calc(100vh - 44px)",
       overflowY: "auto",
     }}>
-      {/* Section Header */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <span style={{ fontSize: "11px", fontWeight: 600, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.04em" }}>
-          Query Configuration
+      {/* Sidebar Terminal Header */}
+      <div style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        borderBottom: "var(--border)",
+        paddingBottom: "8px"
+      }}>
+        <span className="pixel-tag">
+          QUERY_CONFIG // TREE
         </span>
-        <span style={{ fontSize: "11px", color: "#64748b", fontFamily: "var(--font-mono)" }}>
-          dataset: #1
+        <span style={{
+          fontFamily: "var(--font-mono)",
+          fontSize: "13px",
+          color: "var(--text-muted)"
+        }}>
+          DATASET: #1
         </span>
       </div>
 
-      {/* Dataset Info Box */}
+      {/* Target Dataset Tree Inset */}
       <div style={{
-        background: "#1e293b",
-        border: "1px solid #334155",
-        borderRadius: "4px",
+        background: "var(--bg-panel)",
+        border: "var(--border)",
         padding: "8px 10px",
         display: "flex",
         flexDirection: "column",
         gap: "2px"
       }}>
-        <div style={{ fontSize: "11px", color: "#94a3b8" }}>Target Table</div>
-        <div style={{ fontSize: "12px", fontWeight: 600, color: "#f8fafc" }}>
-          {dataInfo?.name || "NYC Taxi Trips"}
+        <div style={{ fontFamily: "var(--font-code)", fontSize: "10px", color: "var(--text-muted)" }}>
+          ▸ TARGET TABLE:
         </div>
-        <div style={{ fontSize: "11px", color: "#64748b", fontFamily: "var(--font-mono)" }}>
-          {dataInfo?.rows?.toLocaleString() || "100,000"} rows registered
+        <div style={{ fontFamily: "var(--font-code)", fontSize: "12px", fontWeight: 700, color: "var(--accent-orange)" }}>
+          {dataInfo?.name || "NYC_TAXI_TRIPS"}
+        </div>
+        <div style={{ fontFamily: "var(--font-mono)", fontSize: "12px", color: "var(--text-primary)" }}>
+          ROWS: {dataInfo?.rows?.toLocaleString() || "100,000"} REGISTERED
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-        {/* Operation */}
+      <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+        {/* SECTION 1: AGGREGATE FUNCTION */}
         <div>
-          <label style={{ display: "block", fontSize: "11px", color: "#94a3b8", marginBottom: "4px", fontWeight: 500 }}>
-            Aggregate Function
-          </label>
-          <select
-            value={queryType}
-            onChange={(e) => setQueryType(e.target.value)}
-            style={{ width: "100%", background: "#0b0f19", border: "1px solid #334155", borderRadius: "4px", padding: "6px 8px", color: "#f8fafc" }}
+          <button
+            type="button"
+            onClick={() => toggleSection("op")}
+            style={{
+              width: "100%",
+              background: "var(--accent-orange)",
+              color: "var(--text-on-orange)",
+              border: "none",
+              padding: "5px 8px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              fontFamily: "var(--font-pixel)",
+              fontSize: "10px",
+              cursor: "pointer",
+              textAlign: "left"
+            }}
           >
-            {QUERY_TYPES.map((t) => (
-              <option key={t} value={t}>
-                {t} {t === "COUNT_DISTINCT" ? "(HyperLogLog)" : ""}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Target Column */}
-        <div>
-          <label style={{ display: "block", fontSize: "11px", color: "#94a3b8", marginBottom: "4px", fontWeight: 500 }}>
-            Target Column
-          </label>
-          <select
-            value={column}
-            onChange={(e) => setColumn(e.target.value)}
-            style={{ width: "100%", background: "#0b0f19", border: "1px solid #334155", borderRadius: "4px", padding: "6px 8px", color: "#f8fafc" }}
-          >
-            {columns.map((c) => (
-              <option key={c} value={c}>{c}</option>
-            ))}
-          </select>
-        </div>
-
-        {/* Precision Controls */}
-        {queryType === "COUNT_DISTINCT" && (
-          <div style={{
-            background: "#131d2e",
-            border: "1px solid #23354d",
-            borderRadius: "4px",
-            padding: "10px",
-            display: "flex",
-            flexDirection: "column",
-            gap: "8px"
-          }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <span style={{ fontSize: "11px", fontWeight: 600, color: "#f8fafc" }}>
-                Precision parameter (p = {precisionP})
-              </span>
-              <span style={{ fontSize: "11px", fontFamily: "var(--font-mono)", color: "#94a3b8" }}>
-                m = {mRegisters}
-              </span>
-            </div>
-
-            <input
-              type="range"
-              min="4"
-              max="16"
-              step="1"
-              value={precisionP}
-              onChange={(e) => setPrecisionP(parseInt(e.target.value))}
-              style={{ width: "100%" }}
-            />
-
+            <span>{sections.op ? "▾" : "▸"} AGGREGATE FUNCTION</span>
+            <span style={{ fontSize: "9px" }}>[SELECT]</span>
+          </button>
+          {sections.op && (
             <div style={{
-              display: "grid",
-              gridTemplateColumns: "1fr 1fr",
-              gap: "6px",
-              fontFamily: "var(--font-mono)",
-              fontSize: "11px",
-              paddingTop: "4px",
-              borderTop: "1px solid #1e293b"
+              background: "var(--bg-page)",
+              border: "var(--border)",
+              borderTop: "none",
+              padding: "8px"
             }}>
-              <div>
-                <span style={{ color: "#64748b", display: "block", fontSize: "10px" }}>Std Error (1.04/√m):</span>
-                <span style={{ color: "#38bdf8" }}>±{theoreticalErr}%</span>
-              </div>
-              <div>
-                <span style={{ color: "#64748b", display: "block", fontSize: "10px" }}>Memory Footprint:</span>
-                <span style={{ color: "#94a3b8" }}>
-                  {memoryBytes < 1024 ? `${memoryBytes} B` : `${(memoryBytes / 1024).toFixed(1)} KB`}
-                </span>
-              </div>
-            </div>
-
-            {/* Representation */}
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: "4px" }}>
-              <span style={{ fontSize: "11px", color: "#94a3b8" }}>State Layout:</span>
-              <div style={{ display: "flex", gap: "4px" }}>
-                {["DENSE", "SPARSE"].map((rep) => (
-                  <button
-                    type="button"
-                    key={rep}
-                    onClick={() => setRepresentation(rep)}
-                    style={{
-                      background: representation === rep ? "#2563eb" : "#0f172a",
-                      border: "1px solid " + (representation === rep ? "#3b82f6" : "#334155"),
-                      borderRadius: "3px",
-                      padding: "2px 8px",
-                      fontSize: "10px",
-                      fontFamily: "var(--font-mono)",
-                      color: representation === rep ? "#ffffff" : "#94a3b8",
-                      cursor: "pointer"
-                    }}
-                  >
-                    {rep}
-                  </button>
+              <select
+                value={queryType}
+                onChange={(e) => setQueryType(e.target.value)}
+                style={{ width: "100%" }}
+              >
+                {QUERY_TYPES.map((t) => (
+                  <option key={t} value={t}>
+                    {t} {t === "COUNT_DISTINCT" ? "[HLL++ PROBABILISTIC]" : ""}
+                  </option>
                 ))}
-              </div>
+              </select>
             </div>
+          )}
+        </div>
+
+        {/* SECTION 2: TARGET COLUMN */}
+        <div>
+          <button
+            type="button"
+            onClick={() => toggleSection("col")}
+            style={{
+              width: "100%",
+              background: "var(--accent-orange)",
+              color: "var(--text-on-orange)",
+              border: "none",
+              padding: "5px 8px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              fontFamily: "var(--font-pixel)",
+              fontSize: "10px",
+              cursor: "pointer",
+              textAlign: "left"
+            }}
+          >
+            <span>{sections.col ? "▾" : "▸"} TARGET COLUMN</span>
+            <span style={{ fontSize: "9px" }}>[FIELD]</span>
+          </button>
+          {sections.col && (
+            <div style={{
+              background: "var(--bg-page)",
+              border: "var(--border)",
+              borderTop: "none",
+              padding: "8px"
+            }}>
+              <select
+                value={column}
+                onChange={(e) => setColumn(e.target.value)}
+                style={{ width: "100%" }}
+              >
+                {columns.map((c) => (
+                  <option key={c} value={c}>{c}</option>
+                ))}
+              </select>
+            </div>
+          )}
+        </div>
+
+        {/* SECTION 3: HLL PRECISION ACCORDION */}
+        {queryType === "COUNT_DISTINCT" && (
+          <div>
+            <button
+              type="button"
+              onClick={() => toggleSection("prec")}
+              style={{
+                width: "100%",
+                background: "var(--accent-orange)",
+                color: "var(--text-on-orange)",
+                border: "none",
+                padding: "5px 8px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                fontFamily: "var(--font-pixel)",
+                fontSize: "10px",
+                cursor: "pointer",
+                textAlign: "left"
+              }}
+            >
+              <span>{sections.prec ? "▾" : "▸"} PRECISION (p = {precisionP})</span>
+              <span style={{ fontSize: "9px" }}>m={mRegisters}</span>
+            </button>
+            {sections.prec && (
+              <div style={{
+                background: "var(--bg-page)",
+                border: "var(--border)",
+                borderTop: "none",
+                padding: "8px",
+                display: "flex",
+                flexDirection: "column",
+                gap: "8px"
+              }}>
+                <input
+                  type="range"
+                  min="4"
+                  max="16"
+                  step="1"
+                  value={precisionP}
+                  onChange={(e) => setPrecisionP(parseInt(e.target.value))}
+                  style={{ width: "100%" }}
+                />
+
+                <div style={{
+                  display: "grid",
+                  gridTemplateColumns: "1fr 1fr",
+                  gap: "6px",
+                  background: "var(--bg-panel)",
+                  border: "var(--border)",
+                  padding: "6px",
+                  fontFamily: "var(--font-mono)",
+                  fontSize: "13px"
+                }}>
+                  <div>
+                    <span style={{ color: "var(--text-muted)", display: "block", fontSize: "10px" }}>THEO_ERR:</span>
+                    <span style={{ color: "var(--star)" }}>&plusmn;{theoreticalErr}%</span>
+                  </div>
+                  <div>
+                    <span style={{ color: "var(--text-muted)", display: "block", fontSize: "10px" }}>MEM_SIZE:</span>
+                    <span style={{ color: "var(--accent-orange)" }}>
+                      {memoryBytes < 1024 ? `${memoryBytes} B` : `${(memoryBytes / 1024).toFixed(1)} KB`}
+                    </span>
+                  </div>
+                </div>
+
+                {/* DENSE / SPARSE TOGGLE */}
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                  <span style={{ fontFamily: "var(--font-code)", fontSize: "10px", color: "var(--text-muted)" }}>
+                    LAYOUT:
+                  </span>
+                  <div style={{ display: "flex", gap: "4px" }}>
+                    {["DENSE", "SPARSE"].map((rep) => {
+                      const isActive = representation === rep;
+                      return (
+                        <button
+                          type="button"
+                          key={rep}
+                          onClick={() => setRepresentation(rep)}
+                          style={{
+                            background: isActive ? "var(--accent-orange)" : "transparent",
+                            color: isActive ? "var(--text-on-orange)" : "var(--text-primary)",
+                            border: isActive ? "1px solid var(--accent-orange)" : "var(--border)",
+                            fontFamily: "var(--font-pixel)",
+                            fontSize: "9px",
+                            padding: "3px 8px",
+                            cursor: "pointer"
+                          }}
+                        >
+                          {rep}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
-        {/* Sampling Rate */}
+        {/* SAMPLING FOR NON-HLL */}
         {queryType !== "COUNT_DISTINCT" && (
-          <div>
-            <label style={{ display: "block", fontSize: "11px", color: "#94a3b8", marginBottom: "4px" }}>
-              Sample Rate: {Math.round(sampleRate * 100)}%
-            </label>
+          <div style={{ background: "var(--bg-panel)", border: "var(--border)", padding: "8px" }}>
+            <div style={{ fontFamily: "var(--font-code)", fontSize: "10px", color: "var(--text-muted)", marginBottom: "4px" }}>
+              SAMPLE_RATE: {Math.round(sampleRate * 100)}%
+            </div>
             <input
               type="range"
               min="0.01"
@@ -236,132 +335,190 @@ export default function QueryConfig({ onSubmit, loading }) {
           </div>
         )}
 
-        {/* Group By */}
+        {/* SECTION 4: GROUP BY */}
         <div>
-          <label style={{ display: "block", fontSize: "11px", color: "#94a3b8", marginBottom: "4px", fontWeight: 500 }}>
-            Group By (Optional)
-          </label>
-          <select
-            value={groupBy}
-            onChange={(e) => setGroupBy(e.target.value)}
-            style={{ width: "100%", background: "#0b0f19", border: "1px solid #334155", borderRadius: "4px", padding: "6px 8px", color: "#f8fafc" }}
-          >
-            <option value="">None (Total Dataset)</option>
-            {columns.map((c) => (
-              <option key={c} value={c}>{c}</option>
-            ))}
-          </select>
-        </div>
-
-        {/* Predicates */}
-        <div>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "4px" }}>
-            <label style={{ fontSize: "11px", color: "#94a3b8", fontWeight: 500 }}>
-              WHERE Predicates ({filters.length})
-            </label>
-            <button
-              type="button"
-              onClick={addFilter}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "2px",
-                background: "transparent",
-                border: "1px solid #334155",
-                borderRadius: "3px",
-                padding: "2px 6px",
-                color: "#38bdf8",
-                fontSize: "10px",
-                cursor: "pointer"
-              }}
-            >
-              <Plus size={10} /> Add
-            </button>
-          </div>
-
-          {filters.map((flt, idx) => (
-            <div key={idx} style={{
-              display: "grid",
-              gridTemplateColumns: "1.1fr 0.7fr 1fr auto",
-              gap: "4px",
+          <button
+            type="button"
+            onClick={() => toggleSection("grp")}
+            style={{
+              width: "100%",
+              background: "var(--accent-orange)",
+              color: "var(--text-on-orange)",
+              border: "none",
+              padding: "5px 8px",
+              display: "flex",
               alignItems: "center",
-              marginBottom: "4px"
+              justifyContent: "space-between",
+              fontFamily: "var(--font-pixel)",
+              fontSize: "10px",
+              cursor: "pointer",
+              textAlign: "left"
+            }}
+          >
+            <span>{sections.grp ? "▾" : "▸"} GROUP BY</span>
+            <span style={{ fontSize: "9px" }}>[OPTIONAL]</span>
+          </button>
+          {sections.grp && (
+            <div style={{
+              background: "var(--bg-page)",
+              border: "var(--border)",
+              borderTop: "none",
+              padding: "8px"
             }}>
               <select
-                value={flt.column}
-                onChange={(e) => updateFilter(idx, "column", e.target.value)}
-                style={{ padding: "4px", fontSize: "11px" }}
+                value={groupBy}
+                onChange={(e) => setGroupBy(e.target.value)}
+                style={{ width: "100%" }}
               >
-                {columns.map((c) => (<option key={c} value={c}>{c}</option>))}
+                <option value="">(NONE - FULL DATASET)</option>
+                {columns.map((c) => (
+                  <option key={c} value={c}>{c}</option>
+                ))}
               </select>
-              <select
-                value={flt.operator}
-                onChange={(e) => updateFilter(idx, "operator", e.target.value)}
-                style={{ padding: "4px", fontSize: "11px" }}
-              >
-                {["=", "!=", ">", "<", ">=", "<="].map((op) => (<option key={op} value={op}>{op}</option>))}
-              </select>
-              <input
-                value={flt.value}
-                onChange={(e) => updateFilter(idx, "value", e.target.value)}
-                placeholder="value"
-                style={{ padding: "4px", fontSize: "11px" }}
-              />
-              <button
-                type="button"
-                onClick={() => removeFilter(idx)}
-                style={{ background: "transparent", border: "none", color: "#ef4444", cursor: "pointer", padding: "2px" }}
-              >
-                <X size={12} />
-              </button>
             </div>
-          ))}
+          )}
         </div>
 
-        {/* Benchmark Checkbox */}
+        {/* SECTION 5: WHERE PREDICATES */}
+        <div>
+          <button
+            type="button"
+            onClick={() => toggleSection("where")}
+            style={{
+              width: "100%",
+              background: "var(--accent-orange)",
+              color: "var(--text-on-orange)",
+              border: "none",
+              padding: "5px 8px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              fontFamily: "var(--font-pixel)",
+              fontSize: "10px",
+              cursor: "pointer",
+              textAlign: "left"
+            }}
+          >
+            <span>{sections.where ? "▾" : "▸"} WHERE PREDICATES ({filters.length})</span>
+            <span style={{ fontSize: "9px" }}>[1NF ROWS]</span>
+          </button>
+          {sections.where && (
+            <div style={{
+              background: "var(--bg-page)",
+              border: "var(--border)",
+              borderTop: "none",
+              padding: "8px",
+              display: "flex",
+              flexDirection: "column",
+              gap: "6px"
+            }}>
+              <button
+                type="button"
+                onClick={addFilter}
+                style={{
+                  background: "transparent",
+                  color: "var(--accent-orange)",
+                  border: "1px dashed var(--accent-orange)",
+                  padding: "4px",
+                  fontFamily: "var(--font-pixel)",
+                  fontSize: "9px",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "4px"
+                }}
+              >
+                <Plus size={10} /> + ADD PREDICATE ROW
+              </button>
+
+              {filters.map((flt, idx) => (
+                <div key={idx} style={{
+                  display: "grid",
+                  gridTemplateColumns: "1.1fr 0.7fr 1fr auto",
+                  gap: "4px",
+                  alignItems: "center"
+                }}>
+                  <select
+                    value={flt.column}
+                    onChange={(e) => updateFilter(idx, "column", e.target.value)}
+                    style={{ padding: "4px", fontSize: "10px" }}
+                  >
+                    {columns.map((c) => (<option key={c} value={c}>{c}</option>))}
+                  </select>
+                  <select
+                    value={flt.operator}
+                    onChange={(e) => updateFilter(idx, "operator", e.target.value)}
+                    style={{ padding: "4px", fontSize: "10px" }}
+                  >
+                    {["=", "!=", ">", "<", ">=", "<="].map((op) => (<option key={op} value={op}>{op}</option>))}
+                  </select>
+                  <input
+                    value={flt.value}
+                    onChange={(e) => updateFilter(idx, "value", e.target.value)}
+                    placeholder="val"
+                    style={{ padding: "4px", fontSize: "10px" }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removeFilter(idx)}
+                    style={{
+                      background: "transparent",
+                      border: "none",
+                      color: "var(--down)",
+                      cursor: "pointer",
+                      padding: "2px"
+                    }}
+                  >
+                    <X size={12} />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* EXACT BENCHMARK TOGGLE */}
         <div style={{
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          padding: "6px 0",
-          borderTop: "1px solid #1e293b",
-          borderBottom: "1px solid #1e293b"
+          background: "var(--bg-panel)",
+          border: "var(--border)",
+          padding: "6px 8px"
         }}>
           <div>
-            <div style={{ fontSize: "11px", color: "#f8fafc", fontWeight: 500 }}>Exact Benchmark</div>
-            <div style={{ fontSize: "10px", color: "#64748b" }}>Run full table scan to measure error</div>
+            <div style={{ fontFamily: "var(--font-pixel)", fontSize: "9px", color: "var(--text-primary)" }}>
+              EXACT_BENCHMARK
+            </div>
+            <div style={{ fontFamily: "var(--font-code)", fontSize: "9px", color: "var(--text-muted)" }}>
+              SCAN FULL TABLE TO EVAL ERROR
+            </div>
           </div>
           <input
             type="checkbox"
             checked={runBenchmark}
             onChange={(e) => setRunBenchmark(e.target.checked)}
-            style={{ width: 14, height: 14, cursor: "pointer" }}
+            style={{ width: "14px", height: "14px", cursor: "pointer", accentColor: "var(--accent-orange)" }}
           />
         </div>
 
-        {/* Execute Button */}
+        {/* EXECUTE QUERY BUTTON (Solid Orange, Black Pixel Font, Press offset border) */}
         <button
           type="submit"
           disabled={loading}
+          className="btn-orange"
           style={{
-            marginTop: "4px",
-            background: "#2563eb",
-            border: "1px solid #1d4ed8",
-            borderRadius: "4px",
-            padding: "8px 12px",
+            marginTop: "6px",
+            width: "100%",
+            padding: "10px",
             fontSize: "12px",
-            fontWeight: 500,
-            color: "#ffffff",
-            cursor: loading ? "not-allowed" : "pointer",
             opacity: loading ? 0.6 : 1,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: "6px"
+            cursor: loading ? "not-allowed" : "pointer"
           }}
         >
-          <Play size={12} fill="#fff" />
-          {loading ? "Executing Query..." : "Execute Query"}
+          <Play size={12} fill="var(--text-on-orange)" />
+          <span>{loading ? "EXECUTING..." : "EXECUTE QUERY"}</span>
         </button>
       </form>
     </aside>

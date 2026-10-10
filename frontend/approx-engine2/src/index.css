@@ -1,138 +1,181 @@
 :root {
-  --bg-app: #0b0f19;
-  --bg-sidebar: #0f172a;
-  --bg-surface: #111827;
-  --bg-surface-hover: #1e293b;
-  --bg-input: #0b0f19;
+  /* Core Design Tokens */
+  --bg-page:        #000000;
+  --bg-panel:       #0d0d2b;
+  --bg-panel-alt:   #14143c;
+  --accent-orange:  #f9a11b;
+  --accent-orange-dim: #c57b0f;
+  --nav-red:        #b3202a;
+  --nav-red-hover:  #8f1821;
+  --text-on-orange: #000000;
+  --text-primary:   #ffffff;
+  --text-muted:     #9a9ab8;
+  --up:             #2ee62e;
+  --down:           #ff3b3b;
+  --star:           #2ea8ff;
+  --chart-fill:     #0b3a4a;
 
-  --border-subtle: #1e293b;
-  --border-default: #334155;
-  --border-focus: #3b82f6;
+  --border:         1px solid rgba(255, 255, 255, 0.12);
+  --border-light:   1px solid rgba(255, 255, 255, 0.22);
+  --border-active:  2px solid var(--accent-orange);
 
-  --primary: #2563eb;
-  --primary-hover: #1d4ed8;
-  --primary-text: #ffffff;
-
-  --text-main: #f8fafc;
-  --text-secondary: #94a3b8;
-  --text-muted: #64748b;
-
-  --status-success: #16a34a;
-  --status-success-bg: #14532d22;
-  --status-success-border: #16a34a44;
-
-  --status-warning: #d97706;
-  --status-warning-bg: #78350f22;
-  --status-warning-border: #d9770644;
-
-  --status-error: #dc2626;
-  --status-error-bg: #7f1d1d22;
-  --status-error-border: #dc262644;
-
-  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-mono: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+  /* Typography */
+  --font-pixel:     'Silkscreen', monospace;
+  --font-mono:      'VT323', monospace;
+  --font-code:      'Space Mono', monospace;
+  --font-sans:      'Inter', system-ui, -apple-system, sans-serif;
 }
 
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  border-radius: 0 !important; /* Sharp, blocky everywhere */
+  box-shadow: none !important;  /* No soft shadows or glows */
+  text-shadow: none !important;
 }
 
 html, body, #root {
-  height: 100%;
-  background: var(--bg-app);
-}
-
-body {
+  min-height: 100%;
+  background: var(--bg-page);
+  color: var(--text-primary);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
-  color: var(--text-main);
-  background: var(--bg-app);
   overflow-x: hidden;
-  font-size: 13px;
-  line-height: 1.5;
 }
 
-/* Custom Scrollbar - Flat, Minimalist */
+/* Faint CRT Scanline Overlay (< 4% opacity) */
+body::before {
+  content: " ";
+  display: block;
+  position: fixed;
+  top: 0; left: 0; bottom: 0; right: 0;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.4) 50%),
+              linear-gradient(90deg, rgba(255, 0, 0, 0.04), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.04));
+  z-index: 9999;
+  background-size: 100% 2px, 3px 100%;
+  pointer-events: none;
+  opacity: 0.035;
+}
+
+/* Retro Pixel Orange Scrollbars */
 ::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--bg-app);
+  background: var(--bg-page);
+  border-left: var(--border);
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--border-default);
-  border-radius: 2px;
+  background: var(--accent-orange);
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--text-muted);
+  background: #ffffff;
 }
 
-/* Input & Select Defaults */
+/* Inputs, Selects, Buttons */
 input, select, textarea {
-  font-family: var(--font-sans);
-  font-size: 12px;
-  color: var(--text-main);
-  background: var(--bg-input);
-  border: 1px solid var(--border-default);
-  border-radius: 4px;
+  font-family: var(--font-code);
+  font-size: 11px;
+  color: var(--text-primary);
+  background: var(--bg-page);
+  border: var(--border-light);
   padding: 6px 8px;
   outline: none;
-  transition: border-color 0.15s ease;
 }
 
 input:focus, select:focus, textarea:focus {
-  border-color: var(--border-focus);
+  border: 1px solid var(--accent-orange);
 }
 
 select option {
-  background: var(--bg-surface);
-  color: var(--text-main);
+  background: var(--bg-panel);
+  color: var(--text-primary);
+  font-family: var(--font-code);
 }
 
 input[type="range"] {
-  accent-color: var(--primary);
-  height: 4px;
-  border-radius: 2px;
-  background: var(--border-default);
+  accent-color: var(--accent-orange);
+  height: 6px;
+  background: var(--bg-panel);
+  border: var(--border);
   padding: 0;
 }
 
-/* Table styling - Data-dense */
+/* Retro UI Components */
+.pixel-tag {
+  background: var(--accent-orange);
+  color: var(--text-on-orange);
+  font-family: var(--font-pixel);
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 2px 6px;
+  display: inline-block;
+  line-height: 1.2;
+}
+
+.panel-retro {
+  background: var(--bg-panel);
+  border: var(--border);
+}
+
+.panel-retro:hover {
+  background: var(--bg-panel-alt);
+}
+
+.btn-orange {
+  background: var(--accent-orange);
+  color: var(--text-on-orange);
+  font-family: var(--font-pixel);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border: none;
+  padding: 8px 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.btn-orange:hover {
+  background: #ffb74d;
+}
+.btn-orange:active {
+  border: 2px solid var(--accent-orange-dim);
+  background: #e68d0e;
+}
+
+/* Tables */
 table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 12px;
 }
 
 th {
-  font-weight: 500;
-  text-align: left;
-  color: var(--text-secondary);
-  border-bottom: 1px solid var(--border-default);
+  font-family: var(--font-pixel);
+  font-size: 9px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--accent-orange);
+  background: var(--bg-panel-alt);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.18);
   padding: 8px 10px;
-  background: #0d1320;
+  text-align: left;
 }
 
 td {
+  font-family: var(--font-code);
+  font-size: 11px;
   padding: 6px 10px;
-  border-bottom: 1px solid var(--border-subtle);
-  color: var(--text-main);
+  border-bottom: var(--border);
+  color: var(--text-primary);
 }
 
 tr:hover td {
-  background: #141c2c;
-}
-
-/* Utility Card Container */
-.panel {
-  background: var(--bg-surface);
-  border: 1px solid var(--border-subtle);
-  border-radius: 4px;
-}
-
-.mono {
-  font-family: var(--font-mono);
+  background: var(--bg-panel-alt);
 }

@@ -8,7 +8,7 @@ import MergeStudio from "./components/MergeStudio/MergeStudio";
 import AnalyticsDashboard from "./components/AnalyticsDashboard/AnalyticsDashboard";
 import ProposalDocs from "./components/ProposalDocs/ProposalDocs";
 import { useQuery } from "./hooks/useQuery";
-import { AlertCircle, Terminal } from "lucide-react";
+import { AlertCircle, Terminal, Cpu } from "lucide-react";
 
 export default function App() {
   const [activeTab, setActiveTab] = useState("query");
@@ -21,27 +21,28 @@ export default function App() {
   };
 
   return (
-    <div style={{ minHeight: "100vh", background: "var(--bg-app)", color: "var(--text-main)" }}>
+    <div style={{ minHeight: "100vh", background: "var(--bg-page)", color: "var(--text-primary)" }}>
       <Navbar activeTab={activeTab} setActiveTab={setActiveTab} />
 
       {activeTab === "query" && (
         <div style={{ display: "flex", height: "calc(100vh - 48px)" }}>
           <QueryConfig onSubmit={handleSubmit} loading={loading} />
-          <main style={{ flex: 1, padding: "16px 20px", overflowY: "auto" }}>
+          <main style={{ flex: 1, padding: "16px 20px", overflowY: "auto", background: "var(--bg-page)" }}>
             {error && (
               <div style={{
-                background: "var(--status-error-bg)",
-                border: "1px solid var(--status-error-border)",
-                borderRadius: "4px",
+                background: "rgba(255, 59, 59, 0.12)",
+                border: "1px solid var(--down)",
                 padding: "8px 12px",
                 fontSize: "12px",
-                color: "#f87171",
+                fontFamily: "var(--font-code)",
+                color: "var(--down)",
                 marginBottom: "14px",
                 display: "flex",
                 alignItems: "center",
-                gap: "6px"
+                gap: "8px"
               }}>
-                <AlertCircle size={14} /> {error}
+                <AlertCircle size={16} strokeWidth={2} />
+                <span>ERROR: {error}</span>
               </div>
             )}
 
@@ -51,36 +52,54 @@ export default function App() {
                 flexDirection: "column",
                 alignItems: "center",
                 justifyContent: "center",
-                height: "60%",
-                gap: "8px",
-                color: "#64748b",
+                height: "65%",
+                gap: "12px",
                 textAlign: "center"
               }}>
                 <div style={{
-                  width: 36,
-                  height: 36,
-                  borderRadius: "4px",
-                  background: "#0f172a",
-                  border: "1px solid #1e293b",
+                  padding: "10px",
+                  border: "1px solid var(--accent-orange)",
+                  background: "var(--bg-panel)",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center"
                 }}>
-                  <Terminal size={18} color="#94a3b8" />
+                  <Terminal size={24} color="var(--accent-orange)" strokeWidth={2} />
                 </div>
-                <div style={{ fontSize: "13px", fontWeight: 500, color: "#f8fafc" }}>
-                  Console Idle
+                <div>
+                  <span className="pixel-tag" style={{ marginBottom: "6px" }}>AQE SYSTEM IDLE</span>
+                  <div style={{ fontSize: "14px", fontFamily: "var(--font-pixel)", color: "var(--accent-orange)", letterSpacing: "0.05em", marginTop: "4px" }}>
+                    AWAITING QUERY INGESTION
+                  </div>
                 </div>
-                <p style={{ fontSize: "12px", maxWidth: 360, color: "#64748b", margin: 0 }}>
-                  Select aggregate parameters and click <strong>Execute Query</strong> to run HLL cardinality estimation and compare against exact table scans.
+                <p style={{ fontSize: "12px", maxWidth: 440, color: "var(--text-muted)", margin: 0, lineHeight: 1.6 }}>
+                  Configure analytical aggregation parameters in the left query tree and dispatch <strong style={{ color: "var(--accent-orange)" }}>EXECUTE QUERY</strong> to run HyperLogLog estimation benchmarks against PostgreSQL tables.
                 </p>
+                <div style={{
+                  border: "var(--border)",
+                  background: "var(--bg-panel)",
+                  padding: "4px 12px",
+                  fontSize: "11px",
+                  fontFamily: "var(--font-code)",
+                  color: "var(--text-muted)"
+                }}>
+                  READY &bull; REGISTER PIPELINE INITIALIZED &bull; 100,000 TRIP ROWS
+                </div>
               </div>
             )}
 
             {loading && (
-              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "60%", gap: "8px" }}>
-                <div style={{ fontSize: "12px", color: "#94a3b8", fontFamily: "var(--font-mono)" }}>
-                  Executing query &amp; updating registers...
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "65%", gap: "12px" }}>
+                <div style={{
+                  padding: "10px",
+                  border: "1px solid var(--accent-orange)",
+                  background: "var(--bg-panel)",
+                  animation: "pulse 1s infinite alternate"
+                }}>
+                  <Cpu size={24} color="var(--accent-orange)" />
+                </div>
+                <div style={{ fontSize: "12px", color: "var(--accent-orange)", fontFamily: "var(--font-pixel)", letterSpacing: "0.05em" }}>
+                  &gt; RUNNING APPROXIMATE ESTIMATION &bull; POPULATING REGISTERS...
                 </div>
               </div>
             )}
