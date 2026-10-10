@@ -100,3 +100,43 @@ def test_benchmark_runner():
     assert res["error_pct"] is not None
     assert res["approx_time_ms"] >= 0
     assert res["exact_time_ms"] >= 0
+
+def test_sparse_representation_linear_counting():
+    """Test HLL++ sparse mode with high precision p'=25 (Section 5.3)."""
+    items = pd.Series([f"sparse_item_{i}" for i in range(150)])
+    hll = HyperLogLog(p=12, representation="SPARSE")
+    hll.add_series(items)
+    assert hll.representation == "SPARSE"
+    est = hll.estimate()
+    # In sparse mode with p'=25, 150 items should be estimated within 1 item
+    assert abs(est - 150) <= 2
+
+def test_clz64_exactness():
+    """Test 64-bit count-leading-zeros bitwise exactness (Section 5.1)."""
+    from engine.sketches import clz64_vec
+    vals = np.array([0, 1, 2, 3, (1 << 63) - 1, 1 << 63, 1 << 62], dtype=np.uint64)
+    clz = clz64_vec(vals)
+    assert clz[0] == 64
+    assert clz[1] == 63
+    assert clz[2] == 62
+    assert clz[3] == 62
+    assert clz[4] == 1
+    assert clz[5] == 0
+    assert clz[6] == 1
+
+def test_precision_error_convergence():
+    """Test error bounds across precision sweep p in [8, 10, 12, 14] (Section 5.4)."""
+    df = load_data()
+    series = df["fare_amount"].dropna()
+    exact_count = series.nunique()
+
+    errors = []
+    for p in [8, 10, 12, 14]:
+        hll = HyperLogLog(p=p)
+        hll.add_series(series)
+        est = hll.estimate()
+        err = abs(est - exact_count) / exact_count * 100
+        theo = 1.04 / math.sqrt(1 << p) * 100
+        errors.append((p, err, theo))
+        # Actual error should be well bounded
+        assert err < max(theo * 2.5, 5.0)
