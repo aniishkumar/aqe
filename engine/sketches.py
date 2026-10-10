@@ -37,38 +37,36 @@ THRESHOLDS: Dict[int, float] = {
     18: 350000.0
 }
 
+# 16-bit leading-zeros precomputed lookup table
+_LUT16: np.ndarray = np.zeros(65536, dtype=np.uint8)
+for _i in range(1, 65536):
+    _LUT16[_i] = 16 - _i.bit_length()
+_LUT16[0] = 16
+
 def clz64_vec(x: np.ndarray) -> np.ndarray:
     """
     Vectorized, exact count-leading-zeros for 64-bit unsigned integers.
-    Uses binary parallel bit-shifts without floating-point precision loss.
+    Uses 16-bit precomputed lookup table for high-throughput vectorized execution.
     """
-    orig = x.copy()
-    n = np.zeros(len(orig), dtype=np.uint8)
-
-    m32 = (orig >> np.uint64(32)) == 0
-    n += np.where(m32, 32, 0).astype(np.uint8)
-    orig = np.where(m32, orig << np.uint64(32), orig)
-
-    m16 = (orig >> np.uint64(48)) == 0
-    n += np.where(m16, 16, 0).astype(np.uint8)
-    orig = np.where(m16, orig << np.uint64(16), orig)
-
-    m8 = (orig >> np.uint64(56)) == 0
-    n += np.where(m8, 8, 0).astype(np.uint8)
-    orig = np.where(m8, orig << np.uint64(8), orig)
-
-    m4 = (orig >> np.uint64(60)) == 0
-    n += np.where(m4, 4, 0).astype(np.uint8)
-    orig = np.where(m4, orig << np.uint64(4), orig)
-
-    m2 = (orig >> np.uint64(62)) == 0
-    n += np.where(m2, 2, 0).astype(np.uint8)
-    orig = np.where(m2, orig << np.uint64(2), orig)
-
-    m1 = (orig >> np.uint64(63)) == 0
-    n += np.where(m1, 1, 0).astype(np.uint8)
-
-    # If original input was 0, total leading zeros in 64 bits is 64
+    t16 = (x >> np.uint64(48)).astype(np.uint16)
+    n = _LUT16[t16].copy()
+    z1 = (t16 == 0)
+    if np.any(z1):
+        x1 = x[z1]
+        t32 = (x1 >> np.uint64(32)).astype(np.uint16)
+        n[z1] += _LUT16[t32]
+        z2 = (t32 == 0)
+        if np.any(z2):
+            idx_z2 = np.where(z1)[0][z2]
+            x2 = x[idx_z2]
+            t48 = (x2 >> np.uint64(16)).astype(np.uint16)
+            n[idx_z2] += _LUT16[t48]
+            z3 = (t48 == 0)
+            if np.any(z3):
+                idx_z3 = idx_z2[z3]
+                x3 = x[idx_z3]
+                t64 = x3.astype(np.uint16)
+                n[idx_z3] += _LUT16[t64]
     return np.where(x == 0, 64, n)
 
 def hash_series_64(series: pd.Series) -> np.ndarray:

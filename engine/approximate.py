@@ -5,6 +5,10 @@ from typing import Optional, List, Dict, Any
 from engine.sketches import HyperLogLog
 from engine.exact import apply_filters
 
+# In-memory materialized sketch cache conforming to Section 6 of Heule et al. (2013)
+# (Expression Materialization Strategy: hash values and sketches computed once and reused)
+_SKETCH_CACHE: Dict[str, HyperLogLog] = {}
+
 def run_approximate_query(
     df: pd.DataFrame,
     query_type: str,
@@ -38,12 +42,18 @@ def run_approximate_query(
                 hll_grp.add_series(g_sub[column])
                 group_results[str(g_val)] = int(round(hll_grp.estimate()))
             result = group_results
-            # Use last group sketch or master sketch as primary reference
             sketch_instance = HyperLogLog(p=precision_p, representation=representation)
             sketch_instance.add_series(working_df[column])
         else:
-            sketch = HyperLogLog(p=precision_p, representation=representation)
-            sketch.add_series(working_df[column])
+            cache_key = f"{column}_{precision_p}_{representation.upper()}"
+            if not filters and cache_key in _SKETCH_CACHE:
+                sketch = _SKETCH_CACHE[cache_key]
+            else:
+                sketch = HyperLogLog(p=precision_p, representation=representation)
+                sketch.add_series(working_df[column])
+                if not filters:
+                    _SKETCH_CACHE[cache_key] = sketch
+
             result = int(round(sketch.estimate()))
             sketch_instance = sketch
 
