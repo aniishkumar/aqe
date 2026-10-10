@@ -2,14 +2,13 @@
 ### A HyperLogLog-Based Relational Platform for Fast Cardinality Estimation and Approximate Analytical Query Processing
 
 [![Course](https://img.shields.io/badge/Course-BCSE302P%20Database%20Systems%20Lab-purple.svg)](https://github.com/aniishkumar/aqe)
-[![Assessment](https://img.shields.io/badge/Assessment-Assessment%206%20(10%20Marks)-blue.svg)](https://github.com/aniishkumar/aqe)
 [![Database](https://img.shields.io/badge/Database-PostgreSQL-336791.svg)](https://www.postgresql.org/)
 [![Algorithm](https://img.shields.io/badge/Algorithm-HyperLogLog%20(Heule%20et%20al.%202013)-10b981.svg)](https://static.googleusercontent.com/media/research.google.com/en//pubs/archive/40671.pdf)
 [![Tests](https://img.shields.io/badge/Tests-PyTest%20Passing-brightgreen.svg)](https://github.com/aniishkumar/aqe)
 
 ---
 
-## 📌 Executive Summary
+##  Executive Summary
 **AQE (Approximate Query Engine)** is a database-backed relational platform designed to trade a controlled amount of accuracy for substantially faster analytical processing. Distinct cardinality estimation (`COUNT DISTINCT`) over massive datasets is typically bounded by expensive full table scans and memory-heavy hash tables. 
 
 AQE solves this challenge by implementing an engineered **HyperLogLog (HLL++)** engine with persistent relational control, lineage tracking, and benchmark evaluation in **PostgreSQL**.
@@ -20,7 +19,7 @@ AQE solves this challenge by implementing an engineered **HyperLogLog (HLL++)** 
 
 ---
 
-## 🏗️ System Architecture
+##  System Architecture
 
 ```text
                +-------------------------------------------+
@@ -57,7 +56,7 @@ AQE solves this challenge by implementing an engineered **HyperLogLog (HLL++)** 
 
 ---
 
-## 📊 Relational Database Design (3NF)
+##  Relational Database Design (3NF)
 
 AQE maintains 11 normalized tables in PostgreSQL:
 
@@ -82,7 +81,7 @@ AQE maintains 11 normalized tables in PostgreSQL:
 
 ---
 
-## ⚡ Algorithmic Engineering (Heule et al. 2013)
+##  Algorithmic Engineering (Heule et al. 2013)
 
 1. **Configurable Precision ($p$)**:
    - $m = 2^p$ registers (e.g., $p=10 \Rightarrow 1,024$ registers; $p=14 \Rightarrow 16,384$ registers).
@@ -101,7 +100,7 @@ AQE maintains 11 normalized tables in PostgreSQL:
 
 ---
 
-## 🚀 Quick Start Guide
+##  Quick Start Guide
 
 ### 1. Prerequisites
 - Python 3.10+
@@ -140,7 +139,7 @@ Open **[http://localhost:5173](http://localhost:5173)** in your browser.
 
 ---
 
-## 🧪 Benchmark Results
+##  Benchmark Results
 
 Tested on 100,000 NYC Taxi Trip records (`fare_amount` distinct estimation):
 
